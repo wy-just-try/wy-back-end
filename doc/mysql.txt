@@ -1,0 +1,65 @@
+//创建用户信息表
+CREATE TABLE `UserInfo` (
+  `Id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自动加1',
+  `Account` varchar(128) NOT NULL DEFAULT '' COMMENT '账户名称',
+  `Passwd` varchar(256) NOT NULL DEFAULT '' COMMENT '账户密码',
+  `UserName` varchar(256) NOT NULL DEFAULT '' COMMENT '用户姓名',
+  `CellPhone` varchar(128) NOT NULL DEFAULT '' COMMENT '手机号码',
+  `MailUrl` varchar(256) NOT NULL DEFAULT '' COMMENT '邮箱地址',
+  `Landline` varchar(128) NOT NULL DEFAULT '' COMMENT '座机号码',
+  `InsertTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '插入时间',
+  `ModifyTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `DeleteFlag` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '记录删除标志',
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY unique_key (`Account`, `CellPhone`)
+) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=gbk;
+
+//创建微网站信息记录表
+CREATE TABLE `WeiNetInfo` (
+  `Id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自动加1',
+  `Account` varchar(128) NOT NULL DEFAULT '' COMMENT '账户名称',
+  `FileName` varchar(128) NOT NULL DEFAULT '' COMMENT '带后缀的页面文件名称，如a.shtml',
+  `WeiName` varchar(256) NOT NULL DEFAULT '' COMMENT '微网站名称',
+  `WeiPic` varchar(256) NOT NULL DEFAULT '' COMMENT '微网站图标',
+  `WeiText` varchar(512) NOT NULL DEFAULT '' COMMENT '微网站描述',
+  `OriginUrl` varchar(512) NOT NULL DEFAULT '' COMMENT '微网站原始链接',
+  `DestUrl` varchar(256) NOT NULL DEFAULT '' COMMENT '微网站短链接',
+  `InsertTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '插入时间',
+  `ModifyTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `DeleteFlag` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '记录删除标志',
+  PRIMARY KEY (`Id`),
+  KEY file_name (`FileName`),
+  UNIQUE KEY unique_key (`DestUrl`)
+) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=gbk;
+
+//创建图文页面信息记录表
+CREATE TABLE `PageInfo` (
+  `Id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自动加1',
+  `Account` varchar(128) NOT NULL DEFAULT '' COMMENT '账户名称',
+  `FileName` varchar(128) NOT NULL DEFAULT '' COMMENT '带后缀的页面文件名称 ，如a.shtml',
+  `PageName` varchar(256) NOT NULL DEFAULT '' COMMENT '页面名称',
+  `PageDesc` varchar(512) NOT NULL DEFAULT '' COMMENT '页面描述',
+  `OriginUrl` varchar(512) NOT NULL DEFAULT '' COMMENT '页面原始链接',
+  `DestUrl` varchar(256) NOT NULL DEFAULT '' COMMENT '页面短链接',
+  `InsertTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '插入时间',
+  `ModifyTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `DeleteFlag` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '记录删除标志',
+  PRIMARY KEY (`Id`),
+  KEY file_name (`FileName`),
+  UNIQUE KEY unique_key (`DestUrl`)
+) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=gbk;
+
+//创建模板页面信息索引表
+CREATE TABLE `TempIndex` (
+  `Id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自动加1',
+  `Type` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '模板类型，1：首页模板；2：二级页面模板；',
+  `FileName` varchar(256) NOT NULL DEFAULT '' COMMENT '模板文件名称',
+  `Title` varchar(512) NOT NULL DEFAULT '' COMMENT '模板标题',
+  `Description` varchar(512) NOT NULL DEFAULT '' COMMENT '模板描述',
+  `ShowPic` varchar(256) NOT NULL DEFAULT '' COMMENT '模板图片URL',
+  `InsertTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '插入时间',
+  `ModifyTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `DeleteFlag` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '记录删除标志',
+  PRIMARY KEY (`Id`),
+  KEY file_name (`FileName`)
+) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=gbk;

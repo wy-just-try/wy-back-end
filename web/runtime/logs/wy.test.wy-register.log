@@ -1,0 +1,9 @@
+2016-10-19 09:48:21 [trace][yii\base\Application::bootstrap]] Bootstrap with yii\log\Dispatcher
+2016-10-19 09:48:21 [trace][yii\web\UrlRule::parseRequest]] Request parsed with URL rule: <module:\w+>/<Controller:\w+>/<action:[a-z0-9\-_]+>
+2016-10-19 09:48:21 [trace][yii\web\Application::handleRequest]] Route requested: 'wy/cgi/test/wy-register'
+2016-10-19 09:48:21 [trace][yii\base\Controller::runAction]] Route to run: wy/cgi/test/wy-register
+2016-10-19 09:48:21 [trace][yii\base\InlineAction::runWithParams]] Running action: app\wy\cgi\TestController::actionWyRegister()
+2016-10-19 09:48:21 [info][application][TestController.php:19] info ~~
+2016-10-19 09:48:21 [info][application][TestController.php:20] -2
+
+
