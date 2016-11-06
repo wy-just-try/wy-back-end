@@ -99,19 +99,25 @@ class LoginBehavior extends Behavior
 		$s_token = $_SESSION[self::sessName()];
 		$s_timeout = $_SESSION[self::sessTimeout()];
 
-		if ($s_timeout > time()) {
-			if (md5(trim((string)$s_token)) === $user_cookie) {
-				Yii::info('登陆校验成功');
-				$this->updateSession('timeout');
-				return BizErrcode::ERR_OK;
+		if ($s_token === md5($_SESSION[self::sessName()])) {
+			if ($s_timeout > time()) {
+				if (md5(trim((string)$s_token)) === $user_cookie) {
+					Yii::info('登陆校验成功');
+					$this->updateSession('timeout');
+					return BizErrcode::ERR_OK;
+				} else {
+					Yii::info('登陆校验失败');
+					return BizErrcode::CHECKLOGIN_FAIL;
+				}
 			} else {
-				Yii::info('登陆校验失败');
-				return BizErrcode::CHECKLOGIN_FAIL;
+				Yii::info('登陆session校验token过期');
+				return BizErrcode::CHECKLOGIN_NOLOGIN;
 			}
 		} else {
-			Yii::info('登陆session校验token过期');
-			return BizErrcode::CHECKLOGIN_NOLOGIN;
+			Yii::error('登录的token不匹配');
+			return BizErrcode::CHECKLOGIN_FAIL;
 		}
+
 	}
 
 	/**
@@ -133,5 +139,44 @@ class LoginBehavior extends Behavior
 		} else {
 			Yii::error(__FUNCTION__ . ' 调用传参错误');
 		}
+	}
+
+	/**
+	 * 在登录后初始化session和cookie
+	 * @param string $username: 登录成功后要显示的用户名
+	 * @return NULL
+	 */
+	public function initSessionAndCookie($username) {
+
+		//session_name(self::sessName());
+		session_start();
+		$str = $this->randStr(30);
+		$_SESSION[self::sessName()] = $str;
+		$_SESSION[self::sessTimeout()] = time() + self::LOGIN_TIMEOUT;
+		setcookie(self::loginAccout(), $username);
+		setcookie(self::loginToken(), md5($str));
+	}
+
+	/**
+	 * 在退出登录后，清理session和cookie
+	 *
+	 */
+	public function uninitSessionAndCookie() {
+		
+		$_SESSION[self::sessName()] = NULL;
+		$_SESSION[self::sessTimeout()] = NULL;
+		setcookie(self::loginAccout());
+		setcookie(self::loginToken());
+
+		session_destroy();
+	}
+
+	/**
+	 * 用来检查图片验证码是否匹配
+	 * @return true 表示图片验证码匹配
+	 *         false 表示图片验证码不匹配
+	 */
+	public function verifyPicCaptcha($picCaptcha) {
+		return TRUE;
 	}
 }

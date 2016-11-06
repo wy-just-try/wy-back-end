@@ -1,0 +1,159 @@
+<?php
+namespace app\wy\ao;
+
+use Yii;
+use app\wy\ao\Massenger;
+
+/**
+ * 验证码 
+ */
+class Captcha {
+
+	const PIC_CAPTCHA = "pic_captcha";
+	const MSG_CAPTCHA = "msg_captcha";
+
+	const PIC_CAPTCHA_LEN = 4;
+	const MSG_CAPTCHA_LEN = 4;
+
+	public function createPicCaptcha() {
+
+		session_start();
+		// 生成随机数
+		$picStr = $this->randStr(self::PIC_CAPTCHA_LEN);
+		Yii::info("picture captcha: $picStr");
+
+		// 生成图片验证码
+
+		// 保存图片验证码到session中
+		$_SESSION[self::PIC_CAPTCHA] = $picStr;
+
+		var_dump($_SESSION);
+		return TRUE;
+	}
+
+	public function createMsgCaptcha() {
+
+		session_start();
+
+		// 生成随机数
+		$msg = $this->randNumber(self::MSG_CAPTCHA_LEN);
+		Yii::info("messanger captcha: $msg");
+
+		// 通过短信发送随机数
+		$this->sendMsgCaptcha($msg);
+
+		// 保存短信验证码到session中
+		$_SESSION[self::MSG_CAPTCHA] = $msg;
+
+		return TRUE;
+	}
+
+
+	/**
+	 * 用来验证图片验证码是否匹配，不管是否匹配成功，此函数在最后都会将session中的图片验证码清空
+	 * 前台需要重新请求生成新的图片验证码
+	 * @param String $picStr: 用户输入的图片验证码
+	 * @return true: 表示图片验证码匹配成功；false：表示图片验证码不匹配
+	 */
+	public function verifyPicCaptcha($picStr) {
+
+		session_start();
+
+		var_dump($picStr);
+		Yii::info("pic captcha: $picStr");
+		if (is_string($picStr) && $picStr != null && strlen($picStr) == self::PIC_CAPTCHA_LEN) {
+
+			var_dump($_SESSION);
+			if (isset($_SESSION[self::PIC_CAPTCHA])) {
+				if ($_SESSION[self::PIC_CAPTCHA] === $picStr) {
+					// 需要清除session中保存的图片验证码，前台需要重新请求生成新的验证码
+					$_SESSION[self::PIC_CAPTCHA] = null;
+					return TRUE;
+				} else {
+					Yii::trace('图片验证码不匹配($picStr, $_SESSION[self::PIC_CAPTCHA]');
+				}
+			} else {
+				Yii::trace('图片验证码未生成');
+			}
+		} else {
+			Yii::trace('输入的图片验证码格式错误');
+		}
+
+		// 即使验证失败也需要清除session中保存的图片验证码，前台需要重新请求生成新的验证码
+		$_SESSION[self::PIC_CAPTCHA] = null;
+
+		return FALSE;
+	}
+
+	/**
+ 	 * 用来验证短信验证码是否匹配，如果匹配成功，会再清空session中的短信验证码，如果不匹配，不会清空session中的短信验证码
+ 	 * @param String $msgStr: 用户输入的短信验证码
+ 	 * @return true: 表示短信验证码匹配；false：表示短信验证码不匹配
+	 */
+	public function verifyMsgCaptcha($msgStr) {
+
+		var_dump($msgStr);
+		Yii::info("msg captcha: $msgStr");
+		if ( is_string($msgStr) && $msgStr != null && strlen($msgStr) == self::MSG_CAPTCHA_LEN) {
+
+			if (isset($_SESSION[self::MSG_CAPTCHA])) {
+				if ($_SESSION[self::MSG_CAPTCHA] === $msgStr) {
+					// 清空session中的短信验证码
+					$_SESSION[self::MSG_CAPTCHA] = null;
+					return TRUE;
+				} else {
+					Yii::trace('短信验证码不匹配($msgStr, $_SESSION[self::MSG_CAPTCHA]');
+				}
+			} else {
+				Yii::trace('短信验证码未生成');
+			}
+		} else {
+			Yii::trace('输入的短信验证码格式错误');
+		}
+
+		return FALSE;
+	}
+
+	private function sendMsgCaptcha($msgStr) {
+		$massenger = new Massenger();
+
+		$massenger->sendMessage('短信验证码', $msgStr);
+	}
+
+	/**
+	 * 用来生成0~9（包含0和9）之间的随机数字符串
+	 * @param $bits 表示要生成的随机数字符串长度
+	 * @return 返回生成的随机数字符串
+	 */
+	private function randNumber($bits = 4) {
+		$str = "";
+		for ($i = 0; $i < $bits; $i++) {
+			$str .= chr(mt_rand(48, 57));
+		}
+
+		return $str;
+	}
+
+
+	/**
+	 * 生成一串随机字符串
+	 * @param  integer $bits [设置返回随机串字符个数，默认为16]
+	 * @return [type]        [返回随机串]
+	 */
+	private function randStr($bits = 6)
+	{
+		$str = "";
+		for ($i=0; $i<$bits; $i++) {
+			$t = mt_rand(1, 3);
+			if ($t === 1) {
+				$str .= chr(mt_rand(48, 57));
+			} else if ($t === 2) {
+				$str .= chr(mt_rand(65, 90));
+			} else {
+				$str .= chr(mt_rand(97, 122));
+			}
+		}
+
+		return $str;
+	}
+}
