@@ -13,7 +13,7 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                '<module:\w+>/<Controller:\w+>/<action:[a-z0-9\\-_]+>' => '<module>/cgi/<Controller>/<action>'            ],
+                '<prefix:cgi>/<module:\w+>/<Controller:\w+>/<action:[a-z0-9\\-_]+>' => '<module>/cgi/<Controller>/<action>'            ],
         ],
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation

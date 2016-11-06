@@ -25,6 +25,30 @@ class BizErrcode extends Errcode {
 	const ILLEGAL_INPUT = 8; //非法输入
 	const DIRTY_WORD_INPUT = 9; //输入数据含有敏感词汇
 
+	// 注册的返回状态
+	const ERR_WRONG_PIC_CAPTCHA = 1;
+	const ERR_WRONG_MSG_CAPTCHA = 2;
+	const ERR_REGISTER          = 3;
+
+	// 登录的返回状态
+	const ERR_NO_ACCOUNT = 1; //用户未注册
+	const ERR_PASSWORD = 2; //登录密码错误
+	const ERR_CAPTCHA = 3;  //登录的图片验证码错误
+
+	//检查是否重复注册的返回状态
+	const ERR_NO_REGISTERED = 0; // 未注册
+	const ERR_REGISTERED = 1; // 已经注册
+
+	//获取短信验证码的返回状态
+	const ERR_SEND_FAILED = 1; // 发送短信失败
+	const ERR_INVALID_CELLPHONE = 2; // 手机号码不合法
+
+	//找回密码的返回状态
+	//const ERR_WRONG_PIC_CAPTCHA = 1;
+	//const ERR_WRONG_MSG_CAPTCHA = 2;
+	const ERR_UNREGISTERED_CELLPHONE = 3;
+	const ERR_INTERNAL = 4;
+
 
 	public static $errMsg = [
 		'-5' => '免登录禁止写操作',
