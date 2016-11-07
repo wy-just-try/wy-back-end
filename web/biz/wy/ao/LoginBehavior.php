@@ -12,6 +12,7 @@ class LoginBehavior extends Behavior
 {
 	const LOGIN_ACCOUNT = '_user_';	//账户名称cookie
 	const LOGIN_TOKEN = 'wy_token';	//登录校验cookie
+	const LOGIN_USERNAME = 'username'; // 登录后获取的用户名
 	const LOGIN_SESSION_NAME = 'login';	//登录校验的session名称
 	const LOGIN_SESSION_TIMEOUT = 'login_timeout';	//过期时间的session名称
 	const LOGIN_TIMEOUT = 7200;	//登录token过期时间为7200秒
@@ -23,6 +24,14 @@ class LoginBehavior extends Behavior
 	public static function loginAccout()
 	{
 		return self::LOGIN_ACCOUNT;
+	}
+
+	/**
+	 * [loginUserName description]
+	 * @return [type] [description]
+	 */
+	public static function loginUserName() {
+		return self::LOGIN_USERNAME;
 	}
 
 	/**
@@ -99,7 +108,7 @@ class LoginBehavior extends Behavior
 		$s_token = $_SESSION[self::sessName()];
 		$s_timeout = $_SESSION[self::sessTimeout()];
 
-		if ($s_token === md5($_SESSION[self::sessName()])) {
+		//if ($s_token === md5($_SESSION[self::sessName()])) {
 			if ($s_timeout > time()) {
 				if (md5(trim((string)$s_token)) === $user_cookie) {
 					Yii::info('登陆校验成功');
@@ -113,10 +122,12 @@ class LoginBehavior extends Behavior
 				Yii::info('登陆session校验token过期');
 				return BizErrcode::CHECKLOGIN_NOLOGIN;
 			}
-		} else {
-			Yii::error('登录的token不匹配');
-			return BizErrcode::CHECKLOGIN_FAIL;
-		}
+		//} else {
+		//	Yii::error('登录的token不匹配');
+		//	return BizErrcode::CHECKLOGIN_FAIL;
+		//}
+
+		return BizErrcode::CHECKLOGIN_FAIL;
 
 	}
 
@@ -127,7 +138,6 @@ class LoginBehavior extends Behavior
 	 */
 	public function updateSession($type = 'all')
 	{
-		session_start();
 		$str = $this->randStr(30);
 		if ($type === 'all') {
 			$_SESSION[self::sessName()] = $str;
@@ -146,14 +156,16 @@ class LoginBehavior extends Behavior
 	 * @param string $username: 登录成功后要显示的用户名
 	 * @return NULL
 	 */
-	public function initSessionAndCookie($username) {
+	public function initSessionAndCookie($userInfo) {
 
 		//session_name(self::sessName());
 		session_start();
 		$str = $this->randStr(30);
 		$_SESSION[self::sessName()] = $str;
 		$_SESSION[self::sessTimeout()] = time() + self::LOGIN_TIMEOUT;
-		setcookie(self::loginAccout(), $username);
+		$_SESSION[self::loginAccout()] = $userInfo['Account'];
+		setcookie(self::loginAccout(), $userInfo['Account']);
+		setcookie(self::loginUserName(), $userInfo['UserName']);
 		setcookie(self::loginToken(), md5($str));
 	}
 

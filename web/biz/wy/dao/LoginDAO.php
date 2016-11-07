@@ -33,6 +33,7 @@ class LoginDAO extends BaseModel
 		$scenarios['logout'] = ['name'];
 		$scenarios['repeat-register'] = ['account', 'cellPhone'];
 		$scenarios['find-password'] = ['cellPhone', 'verifyPic', 'verifyMsg'];
+		$scenarios['update-password'] = ['oldPassword', 'newPassword'];
 
 		return $scenarios;
 	}
@@ -45,6 +46,7 @@ class LoginDAO extends BaseModel
 			[['account', 'passwd', 'verifyPic'], 'required', 'on'=>'login'],
 			[['name'], 'required', 'on'=>'logout'],
 			[['cellPhone', 'verifyPic', 'verifyMsg'], 'required', 'on'=>'find-password'],
+			[['oldPassword', 'newPassword'], 'required', 'on'=>'update-password'],
 		];
 	}
 
@@ -59,7 +61,9 @@ class LoginDAO extends BaseModel
 			'mailUrl',
 			'landLine',
 			'verifyPic',
-			'verifyMsg'
+			'verifyMsg',
+			'oldPassword',
+			'newPassword',
 		];
 	}
 
@@ -78,7 +82,9 @@ class LoginDAO extends BaseModel
 			'mailUrl'	=>	'',
 			'landLine'	=>	'',
 			'verifyPic'	=>	'',
-			'verifyMsg'	=>	''
+			'verifyMsg'	=>	'',
+			'oldPassword' => '',
+			'newPassword' => '',
 		];
 	}
 
@@ -163,9 +169,8 @@ class LoginDAO extends BaseModel
 		// Check if the input password is matched the one from db
 		foreach ($ret as $index => $values) {
 			// 前台会传md5后的数据，所以这里不用md5
-			//$inputPasswd = md5($input['passwd']);
-			//
-			if (!strcmp(md5($input['passwd']), $values['Passwd'])) {
+			//md5($input['passwd'])
+			if (md5($input['passwd']) != $values['Passwd']) {
 				// Login successfully
 				Yii::trace("Successfully login");
 
@@ -177,7 +182,7 @@ class LoginDAO extends BaseModel
 					return BizErrcode::ERR_CAPTCHA;
 				}
 
-				$loginBehavior->initSessionAndCookie($values['UserName']);
+				$loginBehavior->initSessionAndCookie($values);
 
 				return BizErrcode::ERR_OK;
 			}
@@ -197,15 +202,6 @@ class LoginDAO extends BaseModel
 		$sql = "select Account, Passwd, UserName from $this->login_db_table where Account=:account";
 		$params[':account'] = $this->account;
 		return [$sql, $params];
-	}
-
-	/**
-	 * 用来生成图片验证码
-	 *
-	 * @return 返回生成的图片验证码
-	*/
-	public function generatePicCaptcha() {
-
 	}
 
 	/**
@@ -285,10 +281,7 @@ class LoginDAO extends BaseModel
 
 			if (strlen($sql) != 0 && count($params) != 0) {
 				$ret = $db_handler->getOne($sql, $params);
-				if (FALSE == $ret) {
-					Yii::error("此账号未被注册");
-					return BizErrcode::ERR_NO_REGISTERED;
-				} elseif (!is_array($ret)) {
+				if (!is_array($ret)) {
 					Yii::error("The user() doesn't exist");
 					return BizErrcode::ERR_NO_REGISTERED;
 				} elseif (count($ret) == 0) {
@@ -316,7 +309,11 @@ class LoginDAO extends BaseModel
 		return $str;
 	}
 
-	private function updatePassword($newPassword) {
+	/**
+	 * 用来生成更新密码的sql语句，其中$newPassword会进行一次md5，然后才保存到数据库中
+	 * @param string $newPassword: 未进行过md5的密码
+	 */
+	private function updatePasswordSql($newPassword) {
 		$sql = "update $this->login_db_table set Passwd=:password where Cellphone=:cellphone";
 		$param[':password'] = md5($newPassword);
 		$param[':cellphone'] = $this->cellPhone;
@@ -367,7 +364,7 @@ class LoginDAO extends BaseModel
 		Yii::info("new random password: $md5password");
 
 		// update新密码到数据库
-		list($sql, $params) = $this->updatePassword($newPassword);
+		list($sql, $params) = $this->updatePasswordSql($newPassword);
 		if (strlen($sql) != 0 && count($params) != 0) {
 			$ret = $db_handler->execute($sql, $params);
 			if (FALSE == $ret) {
@@ -381,6 +378,74 @@ class LoginDAO extends BaseModel
 		if (!$massenger->sendMessage('新密码', $newPassword)) {
 			Yii::error('发送随机密码失败');
 			return BizErrcode::ERR_INTERNAL;
+		}
+
+		return BizErrcode::ERR_OK;
+	}
+
+
+	/**
+	 * 通过用户账号从数据库中查找对应的账号、用户、密码
+	 *
+	 */
+	private function queryUserInfoBySessionAccount($account) {
+		$sql = "select Account, Passwd, UserName from $this->login_db_table where Account=:account";
+		$params[':account'] = $account;
+		return [$sql, $params];
+	}
+
+	/**
+	 * 用来生成更新密码的sql语句，其中$newPassword会进行一次md5，然后才保存到数据库中
+	 * @param string $newPassword: 未进行过md5的密码
+	 */
+	private function updatePasswordSqlByAccount($newPassword, $account) {
+		$sql = "update $this->login_db_table set Passwd=:password where Account=:account";
+		$param[':password'] = md5($newPassword);
+		$param[':account'] = $account;
+
+		return [$sql, $param];
+	}
+
+	public function updatePassword($input, &$output = []) {
+
+		// Check if the input parameters are valide or not
+		if ($this->checkInputParameters('update-password', $input) != BizErrcode::ERR_OK) {
+			Yii::error('更新密码的输入参数错误');
+			return BizErrCode::ERR_FAILED_UPDATE_PASSWORD;
+		}
+
+		// 检查用户是否登录
+		$loginBehavior = new LoginBehavior();
+		if ($loginBehavior->checkLogin() != BizErrcode::ERR_OK) {
+			Yii::error('更新密码时用户未登录');
+			return BizErrcode::ERR_FAILED_UPDATE_PASSWORD;
+		}
+
+		// 从数据库获取用户信息
+		$db_handler = Yii::$app->db->getSvcDb();
+
+		list($sql, $params) = $this->queryUserInfoBySessionAccount($_SESSION[LoginBehavior::loginAccout()]);
+		Yii::trace("query sql: $sql");
+		$ret = $db_handler->getOne($sql, $params);
+		if (!is_array($ret) || count($ret) == 0 || !isset($ret['Passwd'])) {
+			Yii::error('数据库中未找到此用户');
+			return BizErrcode::ERR_FAILED_UPDATE_PASSWORD;
+		}
+
+		// 比较旧密码与新密码，旧密码已经是md5()之后的数据
+		if (md5($input['oldPassword']) != $ret['Passwd']) {
+			Yii::error('旧密码不匹配');
+			return BizErrcode::ERR_FAILED_UPDATE_PASSWORD;
+		}
+
+		// update新密码到数据库
+		list($sql, $params) = $this->updatePasswordSqlByAccount($input['newPassword'], $_SESSION[LoginBehavior::loginAccout()]);
+		if (strlen($sql) != 0 && count($params) != 0) {
+			$ret = $db_handler->execute($sql, $params);
+			if (FALSE == $ret) {
+				Yii::error("更新密码失败");
+				return BizErrcode::ERR_INTERNAL;
+			}
 		}
 
 		return BizErrcode::ERR_OK;

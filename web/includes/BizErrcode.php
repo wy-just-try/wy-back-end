@@ -49,6 +49,9 @@ class BizErrcode extends Errcode {
 	const ERR_UNREGISTERED_CELLPHONE = 3;
 	const ERR_INTERNAL = 4;
 
+	//更新密码的返回状态
+	const ERR_FAILED_UPDATE_PASSWORD = 1;
+
 
 	public static $errMsg = [
 		'-5' => '免登录禁止写操作',

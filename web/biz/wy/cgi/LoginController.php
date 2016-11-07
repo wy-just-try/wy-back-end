@@ -154,4 +154,28 @@ class LoginController extends RenderController
 
 		return $this->renderJson($ret, $this->retdata);
 	}
+
+	private function _actionUpdatePasswd() {
+
+		$input = $this->GPValue();
+
+		$loginDao = new LoginDAO();
+		$ret = $loginDao->updatePassword($input, $output);
+		if (BizErrcode::ERR_OK != $ret) {
+			Yii::error('更新密码失败');
+			return $ret;
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * 修改密码
+	 */
+	public function actionUpdatePasswd() {
+
+		$ret = $this->_actionUpdatePasswd();
+
+		return $this->renderJson($ret, $this->retdata);
+	}
 }
