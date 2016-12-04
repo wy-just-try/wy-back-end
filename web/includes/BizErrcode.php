@@ -52,6 +52,10 @@ class BizErrcode extends Errcode {
 	//更新密码的返回状态
 	const ERR_FAILED_UPDATE_PASSWORD = 1;
 
+	//获取模板索引的返回状态
+	const ERR_NOLOGIN = 1;
+	const ERR_FAILED = 3;
+
 
 	public static $errMsg = [
 		'-5' => '免登录禁止写操作',
