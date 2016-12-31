@@ -21,8 +21,8 @@ class LoginController extends RenderController
 	{
 		$input = $this->GPValue();
 		foreach ($input as $key => $value) {
-			echo "key=$key, value=$value"."<br>";
-			Yii::trace("key=$key, value=$value");
+			//echo "key=$key, value=$value"."<br>";
+			Yii::info("key=$key, value=$value");
 		}
 
 		//创建DAO对象实例
@@ -43,7 +43,7 @@ class LoginController extends RenderController
 	 */
 	public function actionRegister()
 	{
-		echo "enter into actionRegister";
+		//echo "enter into actionRegister";
 		$ret = $this->_actionRegister();
 
 		return $this->renderJson($ret, $this->retdata);

@@ -10,7 +10,7 @@ use includes\BizErrcode;
 class MiscController extends RenderController {
 
 
-	public function actionGenPic() {
+	private function _actionGenPic() {
 
 		$input = $this->GPValue();
 
@@ -18,17 +18,18 @@ class MiscController extends RenderController {
 		$ret = $miscDAO->genPicCaptcha($input, $output);
 		if ($ret != BizErrcode::ERR_OK) {
 			Yii::error('生成图片验证码失败');
-			return $ret;
 		}
 
-		//$this->retdata['data'] = $output;
+		return $ret;
+	}
+	
+	public function actionGenPic() {
+		$ret = $this->_actionGenPic();
 
 		return $this->renderJson($ret, $this->retdata);
-
 	}
 
-	public function actionGenMsg() {
-
+	private function _actionGenMsg() {
 		$input = $this->GPValue();
 
 		$miscDAO = new MiscDAO();
@@ -38,7 +39,11 @@ class MiscController extends RenderController {
 			return $ret;
 		}
 
-		$this->retdata['data'] = $output;
+		return $ret;
+	}
+
+	public function actionGenMsg() {
+		$ret = $this->_actionGenMsg();
 
 		return $this->renderJson($ret, $this->retdata);
 	}

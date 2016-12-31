@@ -96,7 +96,7 @@ class Captcha {
 				Yii::trace('图片验证码未生成');
 			}
 		} else {
-			Yii::trace('输入的图片验证码格式错误');
+			Yii::trace("输入的图片验证码格式错误($picStr)");
 		}
 
 		// 即使验证失败也需要清除session中保存的图片验证码，前台需要重新请求生成新的验证码
