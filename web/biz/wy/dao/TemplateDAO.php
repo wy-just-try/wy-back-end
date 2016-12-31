@@ -23,7 +23,7 @@ class TemplateDAO extends BaseModel {
 		$scenarios['get-temp-index'] = ['type'];
 		$scenarios['gen-temp'] = ['type', 'name'];
 		$scenarios['update-template'] = ['weiName', 'weiDesc', 'url', 'content'];
-		$scenarios['get-template-index'] = ['url'];
+		$scenarios['get-template-url'] = ['url'];
 
 		return $scenarios;
 	}
