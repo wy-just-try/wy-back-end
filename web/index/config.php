@@ -25,7 +25,7 @@ $config = [
             'enableAutoLogin' => true,
         ],
         'errorHandler' => [
-            'class' => 'common\errCode\BizErrorHandler',
+            //'class' => 'common\errCode\BizErrorHandler',
         ],
         'log' => [
             'traceLevel' => 3,
