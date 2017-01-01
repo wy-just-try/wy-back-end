@@ -4,9 +4,10 @@ namespace app\wy\dao;
 use Yii;
 use includes\BizErrcode;
 use component\model\BaseModel;
-use app\wy\ao\WeiSitesManager;
+use app\wy\ao\WeiSiteManager;
+use app\wy\ao\LoginBehavior;
 
-clase WeiSitesDAO extends BaseModel {
+class WeiSitesDAO extends BaseModel {
 
 	public function init()
 	{
@@ -69,8 +70,8 @@ clase WeiSitesDAO extends BaseModel {
 		return BizErrcode::ERR_OK;
 	}
 
-	public function getAllWeiSites() {
-		if ($this->checkInputParameters('get-all-wei-sites', $input) != BizErrcode::ERR_OK) {
+	public function getAllWeiSites($input, &$output = []) {
+		if ($this->checkInputParameters('get-all-wei-site', $input) != BizErrcode::ERR_OK) {
 			Yii::error('Parameters to generate page are wrong');
 			return BizErrcode::ERR_FAILED;
 		}
@@ -79,7 +80,7 @@ clase WeiSitesDAO extends BaseModel {
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_OK) {
 			Yii::info('用户未登录');
-			return BizErrcode::ERR_NOLOGIN;
+			//return BizErrcode::ERR_NOLOGIN;
 		}
 
 		// 获取账户名
@@ -97,10 +98,11 @@ clase WeiSitesDAO extends BaseModel {
 		}
 
 		$output = $ret;
+
 		return BizErrcode::ERR_OK;
 	}
 
-	public function deleteWeiSite() {
+	public function deleteWeiSite($input, &$output = []) {
 		if ($this->checkInputParameters('delete-wei-site', $input) != BizErrcode::ERR_OK) {
 			Yii::error('Parameters to generate page are wrong');
 			return BizErrcode::ERR_FAILED;
@@ -110,7 +112,7 @@ clase WeiSitesDAO extends BaseModel {
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_OK) {
 			Yii::info('用户未登录');
-			return BizErrcode::ERR_NOLOGIN;
+			//return BizErrcode::ERR_NOLOGIN;
 		}
 
 		// 获取账户名
@@ -127,6 +129,8 @@ clase WeiSitesDAO extends BaseModel {
 			Yii::error("Failed to delete wei site whose short url is $url");
 			return BizErrcode::ERR_FAILED;
 		}
+
+		$output = $ret;
 
 		return BizErrcode::ERR_OK;
 	}

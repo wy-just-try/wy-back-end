@@ -2,14 +2,17 @@
 namespace app\wy\cgi;
 
 use Yii;
-use includes\BizErrcode;
 use component\controller\RenderController;
 use app\wy\dao\WeiSitesDAO;
+use includes\BizErrcode;
 
-clase WeiSitesController extends RenderController {
+class WeisiteController extends RenderController {
 
 	private function _actionGetAllWeiSites() {
 		$input = $this->GPValue();
+		foreach ($input as $key => $value) {
+			Yii::info("input[$key]: $value");
+		}
 
 		$weiSitesDao = new WeiSitesDAO();
 		$ret = $weiSitesDao->getAllWeiSites($input, $output);
@@ -17,6 +20,8 @@ clase WeiSitesController extends RenderController {
 			Yii::error("Failed to get all wei-sites info");
 			return $ret;
 		}
+
+		$this->retdata['data'] = $output;
 
 		return $ret;
 	}
@@ -37,10 +42,12 @@ clase WeiSitesController extends RenderController {
 			return $ret;
 		}
 
+		$this->retdata['data'] = $output;
+
 		return $ret;
 	}
 
-	public function actionDeleteWeiSite() {
+	public function actionDelWei() {
 		$ret = $this->_actionDeleteWeiSite();
 
 		return $this->renderJson($ret, $this->retdata);
