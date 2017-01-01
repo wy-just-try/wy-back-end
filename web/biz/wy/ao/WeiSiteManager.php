@@ -54,7 +54,7 @@ class WeiSiteManager {
 		$weiSiteUserDir = self::WEI_SITES_LOCAL_ROOT_DIR.$account."/";
 		if (!file_exists($weiSiteUserDir) || !is_dir($weiSiteUserDir)) {
 			if (!mkdir($weiSiteUserDir, 0777, true)) {
-				Yii::error("创建微网站目录$weiSiteDir失败");
+				Yii::error("Failed to create wei-site directory($weiSiteDir)");
 				return null;
 			}
 		}
@@ -63,31 +63,31 @@ class WeiSiteManager {
 		$lastWeiSiteNumber = 0;
 		$weiSiteDirs = scandir($weiSiteUserDir);
 		if (!is_array($weiSiteDirs) || count($weiSiteDirs) < 2) {
-			Yii::error("读取微网站用户目录$weiSiteUserDir错误");
+			Yii::error("Failed to read the wei-site user's directory($weiSiteUserDir)");
 			return null;
 		}
 		for ($num = 0; $num < count($weiSiteDirs); $num++) {
 			$weiSiteDir = $weiSiteDirs[$num];
-			Yii::info("微网站目录: $weiSiteDir");
+			Yii::info("The read wei-site directory: $weiSiteDir");
 		}
 		sort($weiSiteDirs, SORT_NATURAL);
 
 		for ($num = 0; $num < count($weiSiteDirs); $num++) {
 			$weiSiteDir = $weiSiteDirs[$num];
-			Yii::info("排序后微网站目录: $weiSiteDir");
+			Yii::info("After sort, the wei-site directory: $weiSiteDir");
 		}
 		for ($num = count($weiSiteDirs)-1; $num >= 0; $num--) {
 			$weisiteDir = $weiSiteDirs[$num];
-			Yii::info("检查: $weiSiteUserDir$weisiteDir");
+			Yii::info("Checking the wei-site directory: $weiSiteUserDir$weisiteDir");
 			if (is_dir($weiSiteUserDir.$weiSiteDirs[$num])
 				&& strlen($weiSiteDirs[$num]) > strlen("weisite_")
 				&& strncmp($weiSiteDirs[$num], "weisite_", strlen("weisite_")) == 0) {
 
 				$lastWeiSiteNumberStr = substr($weiSiteDirs[$num], strlen("weisite_"));
-				Yii::info("最新的weisite: $weisiteDir, number: $lastWeiSiteNumberStr");
+				Yii::info("The latest wei-site directory: $weisiteDir, number: $lastWeiSiteNumberStr");
 				if (is_numeric($lastWeiSiteNumberStr)) {
 					$lastWeiSiteNumber = intval($lastWeiSiteNumberStr);
-					Yii::info("找到了最新的微网站目录: $lastWeiSiteNumber");
+					Yii::info("Found the latest wei-site directory: $lastWeiSiteNumber");
 					break;
 				}
 			}
@@ -95,9 +95,9 @@ class WeiSiteManager {
 
 		//创建当前用户的微网站目录
 		$lastWeiSitePath = $weiSiteUserDir."weisite_".($lastWeiSiteNumber+1)."/";
-		Yii::info("用户($account)的微网站目录$lastWeiSitePath");
+		Yii::info("The account($account)'s wei-site directory is $lastWeiSitePath");
 		if (!mkdir($lastWeiSitePath, 0777, true)) {
-			Yii::error("创建微网站目录失败$lastWeiSitePath");
+			Yii::error("Failed to create the wei-site directory: $lastWeiSitePath");
 			return BizErrcode::ERR_FAILED;
 		}
 
@@ -113,14 +113,14 @@ class WeiSiteManager {
 
 		$weiSiteDir = $this->getWeiSiteDir($account);
 		if (is_null($weiSiteDir)) {
-			Yii::error("获取用户$account的微网站目录失败");
+			Yii::error("Failed to get the account($account)'s wei-site directory");
 			return null;
 		}
 
 		// 创建首页目录
 		if (!file_exists($weiSiteDir.self::FIRST_PAGE_DIR) || !is_dir($weiSiteDir.self::FIRST_PAGE_DIR)) {
 			if (!mkdir($weiSiteDir.self::FIRST_PAGE_DIR, 0777)) {
-				Yii::error("创建用户$account的微网站首页目录失败: $weiSiteDir/self::1st_PAGE_DIR");
+				Yii::error("Failed to create the account($account)'s wei-site's first page directory: $weiSiteDir/self::FIRST_PAGE_DIR");
 				return null;
 			}
 		}
@@ -133,7 +133,7 @@ class WeiSiteManager {
 		//因此如果没有，则认为调用错误
 		$weiSiteUserDir = self::WEI_SITES_LOCAL_ROOT_DIR.$account."/";
 		if (!file_exists($weiSiteUserDir) || !is_dir($weiSiteUserDir)) {
-			Yii::error("微网站目录$weiSiteDir未创建");
+			Yii::error("The wei-site directory($weiSiteDir) isn't created");
 			return null;
 		}
 
@@ -143,10 +143,10 @@ class WeiSiteManager {
 		$lastWeiSiteNumber = 0;
 		$weiSiteDirs = scandir($weiSiteUserDir);
 		if (!is_array($weiSiteDirs) || count($weiSiteDirs) < 2) {
-			Yii::error("读取微网站用户目录$weiSiteUserDir错误");
+			Yii::error("Failed to read the wei-site's user directory($weiSiteUserDir)");
 			return null;
 		} else if (count($weiSiteDirs) == 2) {
-			Yii::error("此用户未创建微网站($weiSiteUserDir)，请先创建微网站首页");
+			Yii::error("This account($account) does not create the wei-site($weiSiteUserDir). Please create it firstly");
 			return null;
 		}
 
@@ -154,7 +154,7 @@ class WeiSiteManager {
 
 		for ($num = count($weiSiteDirs)-1; $num >= 0; $num--) {
 			$weisiteDir = $weiSiteDirs[$num];
-			Yii::info("检查: $weiSiteUserDir$weisiteDir");
+			Yii::info("Checking wei-site directory: $weiSiteUserDir$weisiteDir");
 			if (is_dir($weiSiteUserDir.$weiSiteDirs[$num])
 				&& strlen($weiSiteDirs[$num]) > strlen("weisite_")
 				&& strncmp($weiSiteDirs[$num], "weisite_", strlen("weisite_")) == 0) {
@@ -162,12 +162,12 @@ class WeiSiteManager {
 				// 检查首页目录是否已经创建
 				if (!file_exists($weiSiteUserDir.$weiSiteDirs[$num]."/".self::FIRST_PAGE_DIR)
 					|| !is_dir($weiSiteUserDir.$weiSiteDirs[$num]."/".self::FIRST_PAGE_DIR)) {
-					Yii::error("此用户的微网站($weisiteDir)首页目录未创建，请先创建完微网站首页");
+					Yii::error("The first page directory of this account($account)'s wei-site($weiSiteDir) is not created. Please create it firstly");
 					return null;
 				} else {
 					$files = scandir($weiSiteUserDir.$weiSiteDirs[$num]."/".self::FIRST_PAGE_DIR);
 					if (!is_array($files) || count($files) < 3) {
-						Yii::error("此用户的微网站($weisiteDir)首页目录中没有文件，请先创建完微网站首页");
+						Yii::error("There is no any file in this account($account)'s wei-site directory($weisiteDir). Please finish to create first page of the wei-site firstly");
 						return null;
 					}
 				}
@@ -182,13 +182,13 @@ class WeiSiteManager {
 
 		// 是否找到微网站目录
 		if ($num < 0) {
-			Yii::error("未找到此用户正在编辑的微网站目录");
+			Yii::error("Not found the editing wei-site directory");
 			return null;
 		}
 
 		$weiSiteDir = $weiSiteUserDir.$weiSiteDirs[$num]."/";
 
-		Yii::info("找到此用户正在编辑的微网站目录:");
+		Yii::info("Found the editing wei-site directory: $weiSiteDir");
 		return $weisiteDir;
 	}
 
@@ -196,14 +196,14 @@ class WeiSiteManager {
 
 		$weiSiteDir = $this->getLatestAndActiveWeiSiteDir($account);
 		if (is_null($weiSiteDir)) {
-			Yii::error("获取用户$account的微网站目录失败");
+			Yii::error("Failed to obtain the account($account)'s wei-site directory");
 			return null;
 		}
 
 		// 创建首页目录
 		if (!file_exists($weiSiteDir.self::SECOND_PAGE_DIR) || !is_dir($weiSiteDir.self::SECOND_PAGE_DIR)) {
 			if (!mkdir($weiSiteDir.self::SECOND_PAGE_DIR, 0777)) {
-				Yii::error("创建用户$account的微网站子网页目录失败: $weiSiteDir/self::SECOND_PAGE_DIR");
+				Yii::error("Failed to create the account($account)'s wei-site's sub page directory: $weiSiteDir/self::SECOND_PAGE_DIR");
 				return null;
 			}
 		}
@@ -220,7 +220,7 @@ class WeiSiteManager {
 		if (!is_string($localPath) 
 			|| strlen($localPath) < strlen(self::WEI_SITES_LOCAL_ROOT_DIR) 
 			|| strncmp($localPath, self::WEI_SITES_LOCAL_ROOT_DIR, strlen(self::WEI_SITES_LOCAL_ROOT_DIR)) != 0) {
-			Yii::error("生成首页url的路径错误：$localPath");
+			Yii::error("The page's local path is wrong: $localPath");
 			return null;
 		}
 
@@ -236,7 +236,7 @@ class WeiSiteManager {
 		if (!is_string($originalUrl)
 			|| strlen($originalUrl) < strlen(self::WEI_SITES_URL_ROOT_DIR)
 			|| strncmp($originalUrl, self::WEI_SITES_URL_ROOT_DIR, strlen(self::WEI_SITES_URL_ROOT_DIR))) {
-			Yii::error("生成短链接时传入的url错误: $originalUrl");
+			Yii::error("The original url is wrong: $originalUrl");
 			return null;
 		}
 
@@ -248,7 +248,7 @@ class WeiSiteManager {
 		return $shortUrl;
 	}
 
-	private const SINA_APP_KEY = '4262014387';
+	// private const SINA_APP_KEY = '4262014387';
 
 	/**
 	 * 使用新浪微博服务转换长链接和短链接
@@ -256,33 +256,33 @@ class WeiSiteManager {
 	 * @param string $url 要操作的链接
 	 * @return 如果成功返回生成的链接，否则返回null
 	*/
-	private function convertUrlBySina($type,$url){
-	    if($type) {
-	    	$baseurl = 'http://api.t.sina.com.cn/short_url/shorten.json?source='.self::SINA_APP_KEY.'&url_long='.$url;
-	    }
-	    else {
-	    	$baseurl = 'http://api.t.sina.com.cn/short_url/expand.json?source='.self::SINA_APP_KEY.'&url_short='.$url;
-	    }
+	// private function convertUrlBySina($type,$url){
+	//     if($type) {
+	//     	$baseurl = 'http://api.t.sina.com.cn/short_url/shorten.json?source='.self::SINA_APP_KEY.'&url_long='.$url;
+	//     }
+	//     else {
+	//     	$baseurl = 'http://api.t.sina.com.cn/short_url/expand.json?source='.self::SINA_APP_KEY.'&url_short='.$url;
+	//     }
 
-	    $ch=curl_init();
-	    curl_setopt($ch, CURLOPT_URL,$baseurl);
-	    curl_setopt($ch, CURLOPT_HEADER, 0);
-	    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-	    curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
-	    $strRes=curl_exec($ch);
-	    curl_close($ch);
-	    $arrResponse=json_decode($strRes,true);
-	    if (isset($arrResponse->error) || !isset($arrResponse[0]['url_long']) || $arrResponse[0]['url_long'] == '') {
-	    	return null;
-		}
+	//     $ch=curl_init();
+	//     curl_setopt($ch, CURLOPT_URL,$baseurl);
+	//     curl_setopt($ch, CURLOPT_HEADER, 0);
+	//     curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+	//     curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+	//     $strRes=curl_exec($ch);
+	//     curl_close($ch);
+	//     $arrResponse=json_decode($strRes,true);
+	//     if (isset($arrResponse->error) || !isset($arrResponse[0]['url_long']) || $arrResponse[0]['url_long'] == '') {
+	//     	return null;
+	// 	}
 
-	    if($type) {
-	    	return $arrResponse[0]['url_short'];
-	    }
-	    else {
-	    	return $arrResponse[0]['url_long'];
-	    }
-    }
+	//     if($type) {
+	//     	return $arrResponse[0]['url_short'];
+	//     }
+	//     else {
+	//     	return $arrResponse[0]['url_long'];
+	//     }
+ //    }
 
 	/**
 	 * 将微网站添加到数据库中
@@ -330,7 +330,7 @@ class WeiSiteManager {
 		Yii::info("sql: $sql");
 		$ret = $db_handler->execute($sql, $params);
 		if (false == $ret) {
-			Yii::error("更新微网站失败");
+			Yii::error("Failed to update wei-site info in database");
 			return BizErrcode::ERR_FAILED;
 		}
 
@@ -347,7 +347,7 @@ class WeiSiteManager {
 			}
 		}
 
-		Yii::info("$filePath 不是html文件");
+		Yii::info("$filePath is not html file");
 
 		return false;
 	}
@@ -361,7 +361,7 @@ class WeiSiteManager {
 			}
 		}
 
-		Yii::info("$filename 不是css文件");
+		Yii::info("$filename is not css file");
 		return false;
 	}
 
@@ -373,13 +373,13 @@ class WeiSiteManager {
 		//$originalUrl = $this->convertUrlBySina(false, $weiShortUrl);
 		$originalUrl = UrlConverter::getInstance()->convertUrl(false, $weiShortUrl);
 		if (is_null($originalUrl)) {
-			Yii::error("将短链接$weiShortUrl转换成原始链接出错");
+			Yii::error("Failed to convert the short url($weiShortUrl) to the original url");
 			return null;
 		}
 
 		// 检查原始链接是否正确
 		if (strncmp($originalUrl, self::WEI_SITES_URL_ROOT_DIR, strlen(self::WEI_SITES_URL_ROOT_DIR)) != 0) {
-			Yii::error("恢复后的原始链接不正确$originalUrl");
+			Yii::error("The obtained original url is wrong: $originalUrl");
 			return null;
 		}
 
@@ -390,7 +390,7 @@ class WeiSiteManager {
 		if (!file_exists($pagePath)
 			|| !is_file($pagePath)
 			|| !$this->is_html($pagePath)) {
-			Yii::error("恢复后的原始链接不合法: $pagePath");
+			Yii::error("The page's absolute path is wrong: $pagePath");
 			return null;
 		}
 
@@ -403,7 +403,7 @@ class WeiSiteManager {
 	public function get2ndPagePath($account, $pageUrl) {
 		// 检查原始链接是否正确
 		if (strncmp($pageUrl, self::WEI_SITES_URL_ROOT_DIR, strlen(self::WEI_SITES_URL_ROOT_DIR)) != 0) {
-			Yii::error("子网页的链接不正确$pageUrl");
+			Yii::error("The sub page url is wrong: $pageUrl");
 			return null;
 		}
 
@@ -414,7 +414,7 @@ class WeiSiteManager {
 		if (!file_exists($pagePath)
 			|| !is_file($pagePath)
 			|| !$this->is_html($pagePath)) {
-			Yii::error("子网页的路径不合法: $pagePath");
+			Yii::error("The sub page path is invalid: $pagePath");
 			return null;
 		}
 
@@ -444,13 +444,13 @@ class WeiSiteManager {
 		Yii::info("query sql: $sql");
 		$ret = $db_handler->getAll($sql, $params);
 		if (!is_array($ret)) {
-			Yii::error("获取短链接$shortUrl对应的微网站信息出错");
+			Yii::error("Failed to query the wei-site information corresponding to the short url($shortUrl)");
 			return BizErrcode::ERR_FAILED;
 		} elseif (count($ret) == 0) {
-			Yii::error("短链接$shortUrl在微网站的数据库中不存在");
+			Yii::error("The short url does not exist in the database");
 			return BizErrcode::ERR_FAILED;
 		} elseif (count($ret) > 1) {
-			Yii::error("短链接$shortUrl在微网站的数据库中存在多个");
+			Yii::error("Multiple wei-sites exist corresponding to the short url($shortUrl) in database");
 			return BizErrcode::ERR_FAILED;
 		}
 
@@ -461,11 +461,11 @@ class WeiSiteManager {
 	public function copyTemplate($sourceTemplate, $destTemplate) {
 
 		if (!file_exists($sourceTemplate) || !is_dir($sourceTemplate)) {
-			Yii::error("模板文件夹$sourceTemplate不存在");
+			Yii::error("Template folder($sourceTemplate) does not exist");
 			return null;
 		}
 		if (!file_exists($destTemplate) || !is_dir($destTemplate)) {
-			Yii::error("微网站目录不存在$destTemplate");
+			Yii::error("Wei-site directory($destTemplate) does not exist");
 			return null;
 		}
 
@@ -474,12 +474,12 @@ class WeiSiteManager {
 		foreach ($fileList as $key => $filename) {
 			if ($this->is_html($filename) || $this->is_css($filename)) {
 				if (!copy($sourceTemplate."/".$filename, $destTemplate.$filename)) {
-					Yii::error("复制$sourceTemplate$filename到$destTemplate$filename失败");
+					Yii::error("Failed to copy $sourceTemplate to $destTemplate");
 					continue;
 				}
 				if ($this->is_html($filename)) {
 					$pagePath = $destTemplate.$filename;
-					Yii::info("微网站首页路径$pagePath");
+					Yii::info("Wei-site first page path: $pagePath");
 				}
 			}
 		}
