@@ -18,7 +18,7 @@ class WeiSitesDAO extends BaseModel {
 	public function scenarios()
 	{
 		$scenarios = parent::scenarios();
-		$scenarios['get-all-wei-site'] = [];
+		$scenarios['get-all-wei-sites'] = [];
 		$scenarios['delete-wei-site'] = ['url'];
 
 		return $scenarios;
@@ -71,15 +71,15 @@ class WeiSitesDAO extends BaseModel {
 	}
 
 	public function getAllWeiSites($input, &$output = []) {
-		if ($this->checkInputParameters('get-all-wei-site', $input) != BizErrcode::ERR_OK) {
-			Yii::error('Parameters to generate page are wrong');
+		if ($this->checkInputParameters('get-all-wei-sites', $input) != BizErrcode::ERR_OK) {
+			Yii::error('Parameters to get all wei-sites info are wrong');
 			return BizErrcode::ERR_FAILED;
 		}
 
 		// Should check if this user is login
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_OK) {
-			Yii::info('用户未登录');
+			Yii::info('This user does not login. Please login firstly');
 			//return BizErrcode::ERR_NOLOGIN;
 		}
 
@@ -104,14 +104,14 @@ class WeiSitesDAO extends BaseModel {
 
 	public function deleteWeiSite($input, &$output = []) {
 		if ($this->checkInputParameters('delete-wei-site', $input) != BizErrcode::ERR_OK) {
-			Yii::error('Parameters to generate page are wrong');
+			Yii::error('Parameters to delete wei-site are wrong');
 			return BizErrcode::ERR_FAILED;
 		}
 
 		// Should check if this user is login
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_OK) {
-			Yii::info('用户未登录');
+			Yii::info('User does not login. Please login firstly');
 			//return BizErrcode::ERR_NOLOGIN;
 		}
 
