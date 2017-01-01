@@ -9,7 +9,7 @@ class WeiSiteManager {
 	
 	private $WEI_SITE_DB = 'WeiNetInfo';
 
-	const WEI_SITES_LOCAL_ROOT_DIR = '/Users/apple/software/project/workspace/wy/src/wy-back-end/web/weiSites/';
+	const WEI_SITES_LOCAL_ROOT_DIR = '/Users/apple/software/project/workspace/wy/src/wy-back-end/web/weisites/';
 	const WEI_SITES_URL_ROOT_DIR = 'http://wy626.com/weisites/';
 	const FIRST_PAGE_DIR = '1st/';
 	const SECOND_PAGE_DIR = '2nd/';
