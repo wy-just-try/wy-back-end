@@ -175,7 +175,7 @@ class PageDAO extends BaseModel {
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_OK) {
 			Yii::info('用户未登录');
-			return BizErrcode::ERR_NOLOGIN;
+			//return BizErrcode::ERR_NOLOGIN;
 		}
 
 		// 获取账户名
@@ -202,7 +202,7 @@ class PageDAO extends BaseModel {
 		}
 
 		// update database
-		if (FALSE == $pageManager->updatePageInfo($account, $input['title'], $input['desc'])) {
+		if (FALSE == $pageManager->updatePageInfo($account, $input['title'], $input['desc'], $input['url'])) {
 			Yii::error("Failed to update the page info into database");
 			return BizErrcode::ERR_FAILED;
 		}

@@ -39,6 +39,8 @@ class PageController extends RenderController {
 			return $ret;
 		}
 
+		$this->retdata['data'] = $output;
+
 		return $ret;
 	}
 

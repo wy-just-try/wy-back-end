@@ -40,8 +40,8 @@ class PageManager {
 			$originalUrl = UrlConverter::getInstance()->convertUrl(false, $url);
 		}
 
-		$localPath = self::PAGE_LOCAL_ROOT_DIR.substr($originalUrl, strlen(self::PAGE_LOCAL_ROOT_DIR));
-		Yii::info('$url => local path: $localPath');
+		$localPath = self::PAGE_LOCAL_ROOT_DIR.substr($originalUrl, strlen(self::PAGE_URL_ROOT_DIR));
+		Yii::info("$url => $originalUrl => local path: $localPath");
 
 		return $localPath;
 	}
@@ -146,7 +146,7 @@ class PageManager {
 	 * @return 如果成功，则返回true; 否则返回false
 	*/
 	public function writePageContent($pagePath, $content) {
-		if (file_exists($pagePath) && is_file($pagePath) && is_writeable($pagePath)) {
+		if (file_exists($pagePath) && is_file($pagePath) && !is_writeable($pagePath)) {
 			Yii::error("The file($pagePath) isn't written because of right");
 			return false;
 		}
@@ -243,7 +243,7 @@ class PageManager {
 
 	private function updatePageInfoSql($account, $title, $desc, $shortUrl) {
 		$now = date('Y-m-d H-i-s');
-		$sql = "UPDATE {$this->PAGE_TABLE} SET PageName=:title, PageDesc=:description, ModifyType={$now} WHERE Account=:account AND DestUrl=:shortUrl";
+		$sql = "UPDATE {$this->PAGE_TABLE} SET PageName=:title, PageDesc=:description, ModifyTime='{$now}' WHERE Account=:account AND DestUrl=:shortUrl";
 		$params[':account'] = $account;
 		$params[':title'] = $title;
 		$params[':description'] = $desc;
@@ -256,7 +256,7 @@ class PageManager {
 		$db_handler = Yii::$app->db->getSvcDb();
 		
 		list($sql, $params) = $this->updatePageInfoSql($account, $title, $desc, $shortUrl);
-		$ret = $db_handler->execute();
+		$ret = $db_handler->execute($sql, $params);
 		if (false == $ret) {
 			Yii::error("Failed to update page info to database");
 			return FALSE;
@@ -321,7 +321,7 @@ class PageManager {
 		$db_handler = Yii::$app->db->getSvcDb();
 
 		list($sql, $params) = $this->deletePageInfoSql($account, $shortUrl);
-		$ret = $db_hander->execute();
+		$ret = $db_handler->execute($sql, $params);
 		if (FALSE == $ret) {
 			Yii::error("Failed to delete page info whose short url is $shortUrl");
 			return FALSE;
