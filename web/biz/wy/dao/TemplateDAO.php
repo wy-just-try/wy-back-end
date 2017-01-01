@@ -83,13 +83,6 @@ class TemplateDAO extends BaseModel {
 		return BizErrcode::ERR_OK;
 	}
 
-	private function queryTempIndexByType() {
-		$sql = "SELECT Id, Title, Description, ShowPic from $this->template_db where Type=:type";
-		$params[':type'] = $this->type;
-
-		return [$sql, $params];
-	}
-
 	public function getTemplateIndex($input, &$output = []) {
 		if ($this->checkInputParameters('get-temp-index', $input) != BizErrcode::ERR_OK) {
 			Yii::error('获取模板索引传入的参数错误');
@@ -103,17 +96,10 @@ class TemplateDAO extends BaseModel {
 			return BizErrcode::ERR_NOLOGIN;
 		}
 
-		// Fetch the user's account, password and username from db
-		$db_handler = Yii::$app->db->getSvcDb();
-
-		list($sql, $params) = $this->queryTempIndexByType();
-		Yii::trace("query sql: $sql");
-		$ret = $db_handler->getAll($sql, $params);
-		if (!is_array($ret)) {
-			Yii::error("模板索引为空");
-			return BizErrcode::ERR_FAILED;
-		} elseif (count($ret) == 0) {
-			Yii::error("获取到的模板索引为空");
+		$tempMgr = TemplateManager::getInstance();
+		$ret = $tempMgr->queryAllTemplateInfo($templateType);
+		if (FALSE == $ret) {
+			Yii::error("Failed to get all template info, template type: $templateType");
 			return BizErrcode::ERR_FAILED;
 		}
 
