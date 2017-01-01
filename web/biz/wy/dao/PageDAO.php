@@ -5,6 +5,8 @@ use Yii;
 use includes\BizErrcode;
 use component\model\BaseModel;
 use app\wy\ao\PageManager;
+use app\wy\ao\LoginBehavior;
+use app\wy\ao\UrlConverter;
 
 class PageDAO extends BaseModel {
 
@@ -91,7 +93,7 @@ class PageDAO extends BaseModel {
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_OK) {
 			Yii::info('用户未登录');
-			return BizErrcode::ERR_NOLOGIN;
+			//return BizErrcode::ERR_NOLOGIN;
 		}
 
 		// 获取账户名
@@ -110,7 +112,7 @@ class PageDAO extends BaseModel {
 			return BizErrcode::ERR_FAILED;
 		}
 
-		if (!$pageManager->writePageContent($pagePath, $content)) {
+		if (!$pageManager->writePageContent($pagePath, $input['content'])) {
 			Yii::error("Failed to write content to file: $pagePath");
 			// It's best to delete the file pointed by pagePath
 			if(!$pageManager->deletePageDir($pagePath)) {
@@ -145,7 +147,7 @@ class PageDAO extends BaseModel {
 		}
 
 		// Insert the page into PageInfo table
-		$ret = pageManager->insertPageInfo($account, $pagePath, $input['title'], $input['desc'], $pageOriginalUrl, $shortUrl);
+		$ret = $pageManager->insertPageInfo($account, $pagePath, $input['title'], $input['desc'], $pageOriginalUrl, $shortUrl);
 		if ($ret == FALSE) {
 			Yii::error("Failed to insert page into database");
 			// It's best to delete the file pointed by pagePath
@@ -155,6 +157,8 @@ class PageDAO extends BaseModel {
 			}
 			return BizErrcode::ERR_FAILED;
 		}
+
+		$output['destUrl'] = $shortUrl;
 
 
 		return BizErrcode::ERR_OK;
@@ -240,7 +244,7 @@ class PageDAO extends BaseModel {
 		return BizErrcode::ERR_OK;
 	}
 
-	public function getAllPages($input, &$ouput = []) {
+	public function getAllPages($input, &$output = []) {
 
 		if ($this->checkInputParameters('get-all-pages', $input) != BizErrcode::ERR_OK) {
 			Yii::error('Parameters to generate page are wrong');
@@ -251,7 +255,7 @@ class PageDAO extends BaseModel {
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_OK) {
 			Yii::info('用户未登录');
-			return BizErrcode::ERR_NOLOGIN;
+			//return BizErrcode::ERR_NOLOGIN;
 		}
 
 		// 获取账户名
@@ -262,7 +266,8 @@ class PageDAO extends BaseModel {
 		}
 
 		$pageManager = new PageManager;
-		if (FALSE == $pageManager->getAllPageInfo($account)) {
+		$ret = $pageManager->getAllPageInfo($account);
+		if (FALSE == $ret) {
 			Yii::error("Failed to get the $account's page info");
 			return BizErrcode::ERR_FAILED;
 		}

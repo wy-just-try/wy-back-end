@@ -18,6 +18,8 @@ class PageController extends RenderController {
 			return $ret;
 		}
 
+		$this->retdata['data'] = $output;
+
 		return $ret;
 	}
 
@@ -56,6 +58,8 @@ class PageController extends RenderController {
 			return $ret;
 		}
 
+		$this->retdata['data'] = $output;
+
 		return $ret;
 	}
 
@@ -75,11 +79,13 @@ class PageController extends RenderController {
 			return $ret;
 		}
 
+		$this->retdata['data'] = $output;
+
 		return $ret;
 	}
 
 	public function actionGetAll() {
-		$ret = $this->getAllPages();
+		$ret = $this->_actionGetAllPages();
 
 		return $this->renderJson($ret, $this->retdata);
 	}
@@ -93,6 +99,8 @@ class PageController extends RenderController {
 			Yii::error("Failed to delete page");
 			return $ret;
 		}
+
+		$this->retdata['data'] = $output;
 
 		return $ret;
 	}

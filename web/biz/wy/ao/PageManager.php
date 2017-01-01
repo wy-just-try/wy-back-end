@@ -3,6 +3,7 @@ namespace app\wy\ao;
 
 use Yii;
 use includes\BizErrcode;
+use app\wy\ao\UrlConverter;
 
 class PageManager {
 	
@@ -159,13 +160,13 @@ class PageManager {
 		$count = fwrite($fileHandler, $content);
 		if (FALSE == $count || $count < strlen($content)) {
 			Yii::error("Failed to write content to page file: $pagePath");
-			if (FALSE == fcloe($fileHandler)) {
+			if (FALSE == fclose($fileHandler)) {
 				Yii::error("Failed to close page file: $pagePath");
 			}
 			return false;
 		}
 
-		if (FALSE == fcloe($fileHandler)) {
+		if (FALSE == fclose($fileHandler)) {
 			Yii::error("Failed to close page file: $pagePath");
 			return false;
 		}
@@ -210,13 +211,13 @@ class PageManager {
 		return true;
 	}
 
-	private PAGE_TABLE = 'PageInfo';
+	private $PAGE_TABLE = 'PageInfo';
 
 	private function insertPageInfoSql($account, $pagePath, $title, $desc, $originalUrl, $shortUrl) {
 		$now = date('Y-m-d H-i-s');
-		$sql = "INSERT INTO {$this->PAGE_TABLE} (Account, FileName, PageName, PageDesc, OriginalUrl, DestUrl, InsertTime, ModifyTime) VALUES (:account, :filePath, :title, :description, :originalUrl, :shortUrl, {$now}, {$now}";
+		$sql = "INSERT INTO {$this->PAGE_TABLE} (Account, FileName, PageName, PageDesc, OriginUrl, DestUrl, InsertTime, ModifyTime) VALUES (:account, :filePath, :title, :description, :originalUrl, :shortUrl, '{$now}', '{$now}')";
 		$params[':account'] = $account;
-		$params[':FileName'] = $pagePath;
+		$params[':filePath'] = $pagePath;
 		$params[':title'] = $title;
 		$params[':description'] = $desc;
 		$params[':originalUrl'] = $originalUrl;
@@ -228,7 +229,7 @@ class PageManager {
 	public function insertPageInfo($account, $pagePath, $title, $desc, $original, $shortUrl) {
 
 		$db_handler = Yii::$app->db->getSvcDb();
-		list($sql, $params) = $this->insertPageInfoSql($account $pagePath, $title, $desc, $original, $shortUrl);
+		list($sql, $params) = $this->insertPageInfoSql($account, $pagePath, $title, $desc, $original, $shortUrl);
 
 		Yii::info("sql: $sql");
 		$ret = $db_handler->insert($sql, $params);
@@ -242,7 +243,7 @@ class PageManager {
 
 	private function updatePageInfoSql($account, $title, $desc, $shortUrl) {
 		$now = date('Y-m-d H-i-s');
-		$sql = "UPDATE {$this->PAGE_TABLE} SET PageName=:title, PageDesc=:description, ModifyType={$now} WHERE Account=:account AND DestUrl=:shortUrl"
+		$sql = "UPDATE {$this->PAGE_TABLE} SET PageName=:title, PageDesc=:description, ModifyType={$now} WHERE Account=:account AND DestUrl=:shortUrl";
 		$params[':account'] = $account;
 		$params[':title'] = $title;
 		$params[':description'] = $desc;
@@ -252,7 +253,7 @@ class PageManager {
 	}
 
 	public function updatePageInfo($account, $title, $desc, $shortUrl) {
-		$db_handler = Yii::app->db->getSvcDb();
+		$db_handler = Yii::$app->db->getSvcDb();
 		
 		list($sql, $params) = $this->updatePageInfoSql($account, $title, $desc, $shortUrl);
 		$ret = $db_handler->execute();
@@ -276,9 +277,9 @@ class PageManager {
 
 	public function getPageInfo($account, $shortUrl) {
 
-		$db_handler = Yii::app->db->getSvcDb();
+		$db_handler = Yii::$app->db->getSvcDb();
 
-		list($sql, $params) = $this->getAllPageInfoSql($account);
+		list($sql, $params) = $this->getPageInfoSql($account, $shortUrl);
 		$ret = $db_handler->getOne($sql, $params);
 		if(FALSE == $ret) {
 			Yii::error("Failed to get all of page info of the account($account)");
@@ -296,7 +297,7 @@ class PageManager {
 	}
 
 	public function getAllPageInfo($account) {
-		$db_handler = Yii::app->db->getSvcDb();
+		$db_handler = Yii::$app->db->getSvcDb();
 
 		list($sql, $params) = $this->getAllPageInfoSql($account);
 		$ret = $db_handler->getAll($sql, $params);
@@ -317,7 +318,7 @@ class PageManager {
 	}
 
 	public function deletePageInfo($account, $shortUrl) {
-		$db_handler = Yii::app->db->getSvcDb();
+		$db_handler = Yii::$app->db->getSvcDb();
 
 		list($sql, $params) = $this->deletePageInfoSql($account, $shortUrl);
 		$ret = $db_hander->execute();
