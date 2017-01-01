@@ -14,8 +14,8 @@ class UrlConverter {
 
 	}
 
-	public static getInstance() {
-		if (is_null($this->instance) 
+	public static function getInstance() {
+		if (is_null(self::$instance) 
 			|| !(self::$instance instanceof self)) {
 				self::$instance = new self;
 		}
@@ -23,7 +23,7 @@ class UrlConverter {
 		return self::$instance;
 	}
 
-	private const SINA_APP_KEY = '4262014387';
+	const SINA_APP_KEY = '4262014387';
 
 	/**
 	 * 使用新浪微博服务转换长链接和短链接
