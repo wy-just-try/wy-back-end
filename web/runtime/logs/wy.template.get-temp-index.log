@@ -1,0 +1,99 @@
+2017-01-02 04:35:52 [trace][yii\base\Application::bootstrap]] Bootstrap with yii\log\Dispatcher
+2017-01-02 04:35:52 [trace][yii\web\UrlRule::parseRequest]] Request parsed with URL rule: <module:\w+>/<Controller:\w+>/<action:[a-z0-9\-_]+>
+2017-01-02 04:35:52 [trace][yii\web\Application::handleRequest]] Route requested: 'wy/cgi/template/get-temp-index'
+2017-01-02 04:35:52 [trace][yii\base\Controller::runAction]] Route to run: wy/cgi/template/get-temp-index
+2017-01-02 04:35:52 [trace][yii\base\InlineAction::runWithParams]] Running action: app\wy\cgi\TemplateController::actionGetTempIndex()
+2017-01-02 04:35:52 [trace][application][TemplateController.php:16=>TemplateController.php:43] key=type, value=2
+2017-01-02 04:35:52 [info][application][LoginBehavior.php:95=>TemplateDAO.php:94=>TemplateController.php:20] 获取登陆校验cookie失败
+2017-01-02 04:35:52 [info][application][TemplateDAO.php:95=>TemplateController.php:20=>TemplateController.php:43] 用户未登录
+2017-01-02 04:35:52 [error][application][TemplateController.php:22=>TemplateController.php:43] failed to get template index
+
+
+2017-01-02 04:36:50 [trace][yii\base\Application::bootstrap]] Bootstrap with yii\log\Dispatcher
+2017-01-02 04:36:50 [trace][yii\web\UrlRule::parseRequest]] Request parsed with URL rule: <module:\w+>/<Controller:\w+>/<action:[a-z0-9\-_]+>
+2017-01-02 04:36:50 [trace][yii\web\Application::handleRequest]] Route requested: 'wy/cgi/template/get-temp-index'
+2017-01-02 04:36:50 [trace][yii\base\Controller::runAction]] Route to run: wy/cgi/template/get-temp-index
+2017-01-02 04:36:50 [trace][yii\base\InlineAction::runWithParams]] Running action: app\wy\cgi\TemplateController::actionGetTempIndex()
+2017-01-02 04:36:50 [trace][application][TemplateController.php:16=>TemplateController.php:43] key=type, value=2
+2017-01-02 04:36:50 [info][application][LoginBehavior.php:95=>TemplateDAO.php:94=>TemplateController.php:20] 获取登陆校验cookie失败
+2017-01-02 04:36:50 [info][application][TemplateDAO.php:95=>TemplateController.php:20=>TemplateController.php:43] 用户未登录
+2017-01-02 04:36:50 [error][application][TemplateController.php:22=>TemplateController.php:43] failed to get template index
+
+
+2017-01-02 04:38:47 [trace][yii\base\Application::bootstrap]] Bootstrap with yii\log\Dispatcher
+2017-01-02 04:38:47 [trace][yii\web\UrlRule::parseRequest]] Request parsed with URL rule: <module:\w+>/<Controller:\w+>/<action:[a-z0-9\-_]+>
+2017-01-02 04:38:47 [trace][yii\web\Application::handleRequest]] Route requested: 'wy/cgi/template/get-temp-index'
+2017-01-02 04:38:47 [trace][yii\base\Controller::runAction]] Route to run: wy/cgi/template/get-temp-index
+2017-01-02 04:38:47 [trace][yii\base\InlineAction::runWithParams]] Running action: app\wy\cgi\TemplateController::actionGetTempIndex()
+2017-01-02 04:38:47 [trace][application][TemplateController.php:16=>TemplateController.php:43] key=type, value=2
+2017-01-02 04:38:47 [info][application][LoginBehavior.php:95=>TemplateDAO.php:94=>TemplateController.php:20] 获取登陆校验cookie失败
+2017-01-02 04:38:47 [info][application][TemplateDAO.php:95=>TemplateController.php:20=>TemplateController.php:43] 用户未登录
+2017-01-02 04:38:47 [error][application][TemplateController.php:22=>TemplateController.php:43] failed to get template index
+
+
+2017-01-02 04:39:10 [trace][yii\base\Application::bootstrap]] Bootstrap with yii\log\Dispatcher
+2017-01-02 04:39:10 [trace][yii\web\UrlRule::parseRequest]] Request parsed with URL rule: <module:\w+>/<Controller:\w+>/<action:[a-z0-9\-_]+>
+2017-01-02 04:39:10 [trace][yii\web\Application::handleRequest]] Route requested: 'wy/cgi/template/get-temp-index'
+2017-01-02 04:39:10 [trace][yii\base\Controller::runAction]] Route to run: wy/cgi/template/get-temp-index
+2017-01-02 04:39:10 [trace][yii\base\InlineAction::runWithParams]] Running action: app\wy\cgi\TemplateController::actionGetTempIndex()
+2017-01-02 04:39:10 [trace][application][TemplateController.php:16=>TemplateController.php:43] key=type, value=2
+2017-01-02 04:39:10 [info][application][LoginBehavior.php:95=>TemplateDAO.php:94=>TemplateController.php:20] 获取登陆校验cookie失败
+2017-01-02 04:39:10 [info][application][TemplateDAO.php:95=>TemplateController.php:20=>TemplateController.php:43] 用户未登录
+2017-01-02 04:39:10 [error][application][TemplateController.php:22=>TemplateController.php:43] failed to get template index
+
+
+2017-01-02 04:39:46 [trace][yii\base\Application::bootstrap]] Bootstrap with yii\log\Dispatcher
+2017-01-02 04:39:46 [trace][yii\web\UrlRule::parseRequest]] Request parsed with URL rule: <module:\w+>/<Controller:\w+>/<action:[a-z0-9\-_]+>
+2017-01-02 04:39:46 [trace][yii\web\Application::handleRequest]] Route requested: 'wy/cgi/template/get-temp-index'
+2017-01-02 04:39:46 [trace][yii\base\Controller::runAction]] Route to run: wy/cgi/template/get-temp-index
+2017-01-02 04:39:46 [trace][yii\base\InlineAction::runWithParams]] Running action: app\wy\cgi\TemplateController::actionGetTempIndex()
+2017-01-02 04:39:46 [trace][application][TemplateController.php:16=>TemplateController.php:43] key=type, value=2
+2017-01-02 04:39:46 [info][application][LoginBehavior.php:95=>TemplateDAO.php:94=>TemplateController.php:20] 获取登陆校验cookie失败
+2017-01-02 04:39:46 [info][application][TemplateDAO.php:95=>TemplateController.php:20=>TemplateController.php:43] 用户未登录
+2017-01-02 04:39:46 [error][application][TemplateController.php:22=>TemplateController.php:43] failed to get template index
+
+
+2017-01-02 04:39:46 [trace][yii\base\Application::bootstrap]] Bootstrap with yii\log\Dispatcher
+2017-01-02 04:39:46 [trace][yii\web\UrlRule::parseRequest]] Request parsed with URL rule: <module:\w+>/<Controller:\w+>/<action:[a-z0-9\-_]+>
+2017-01-02 04:39:46 [trace][yii\web\Application::handleRequest]] Route requested: 'wy/cgi/template/get-temp-index'
+2017-01-02 04:39:46 [trace][yii\base\Controller::runAction]] Route to run: wy/cgi/template/get-temp-index
+2017-01-02 04:39:46 [trace][yii\base\InlineAction::runWithParams]] Running action: app\wy\cgi\TemplateController::actionGetTempIndex()
+2017-01-02 04:39:46 [trace][application][TemplateController.php:16=>TemplateController.php:43] key=type, value=2
+2017-01-02 04:39:46 [info][application][LoginBehavior.php:95=>TemplateDAO.php:94=>TemplateController.php:20] 获取登陆校验cookie失败
+2017-01-02 04:39:46 [info][application][TemplateDAO.php:95=>TemplateController.php:20=>TemplateController.php:43] 用户未登录
+2017-01-02 04:39:46 [error][application][TemplateController.php:22=>TemplateController.php:43] failed to get template index
+
+
+2017-01-02 04:40:32 [trace][yii\base\Application::bootstrap]] Bootstrap with yii\log\Dispatcher
+2017-01-02 04:40:32 [trace][yii\web\UrlRule::parseRequest]] Request parsed with URL rule: <module:\w+>/<Controller:\w+>/<action:[a-z0-9\-_]+>
+2017-01-02 04:40:32 [trace][yii\web\Application::handleRequest]] Route requested: 'wy/cgi/template/get-temp-index'
+2017-01-02 04:40:32 [trace][yii\base\Controller::runAction]] Route to run: wy/cgi/template/get-temp-index
+2017-01-02 04:40:32 [trace][yii\base\InlineAction::runWithParams]] Running action: app\wy\cgi\TemplateController::actionGetTempIndex()
+2017-01-02 04:40:32 [trace][application][TemplateController.php:16=>TemplateController.php:43] key=type, value=2
+2017-01-02 04:40:32 [info][application][LoginBehavior.php:95=>TemplateDAO.php:94=>TemplateController.php:20] 获取登陆校验cookie失败
+2017-01-02 04:40:32 [info][application][TemplateDAO.php:95=>TemplateController.php:20=>TemplateController.php:43] 用户未登录
+2017-01-02 04:40:32 [error][application][TemplateController.php:22=>TemplateController.php:43] failed to get template index
+
+
+2017-01-02 04:40:33 [trace][yii\base\Application::bootstrap]] Bootstrap with yii\log\Dispatcher
+2017-01-02 04:40:33 [trace][yii\web\UrlRule::parseRequest]] Request parsed with URL rule: <module:\w+>/<Controller:\w+>/<action:[a-z0-9\-_]+>
+2017-01-02 04:40:33 [trace][yii\web\Application::handleRequest]] Route requested: 'wy/cgi/template/get-temp-index'
+2017-01-02 04:40:33 [trace][yii\base\Controller::runAction]] Route to run: wy/cgi/template/get-temp-index
+2017-01-02 04:40:33 [trace][yii\base\InlineAction::runWithParams]] Running action: app\wy\cgi\TemplateController::actionGetTempIndex()
+2017-01-02 04:40:33 [trace][application][TemplateController.php:16=>TemplateController.php:43] key=type, value=2
+2017-01-02 04:40:33 [info][application][LoginBehavior.php:95=>TemplateDAO.php:94=>TemplateController.php:20] 获取登陆校验cookie失败
+2017-01-02 04:40:33 [info][application][TemplateDAO.php:95=>TemplateController.php:20=>TemplateController.php:43] 用户未登录
+2017-01-02 04:40:33 [error][application][TemplateController.php:22=>TemplateController.php:43] failed to get template index
+
+
+2017-01-02 06:26:45 [trace][yii\base\Application::bootstrap]] Bootstrap with yii\log\Dispatcher
+2017-01-02 06:26:45 [trace][yii\web\UrlRule::parseRequest]] Request parsed with URL rule: <module:\w+>/<Controller:\w+>/<action:[a-z0-9\-_]+>
+2017-01-02 06:26:45 [trace][yii\web\Application::handleRequest]] Route requested: 'wy/cgi/template/get-temp-index'
+2017-01-02 06:26:45 [trace][yii\base\Controller::runAction]] Route to run: wy/cgi/template/get-temp-index
+2017-01-02 06:26:45 [trace][yii\base\InlineAction::runWithParams]] Running action: app\wy\cgi\TemplateController::actionGetTempIndex()
+2017-01-02 06:26:45 [trace][application][TemplateController.php:16=>TemplateController.php:43] key=type, value=2
+2017-01-02 06:26:45 [info][application][LoginBehavior.php:95=>TemplateDAO.php:94=>TemplateController.php:20] 获取登陆校验cookie失败
+2017-01-02 06:26:45 [info][application][TemplateDAO.php:95=>TemplateController.php:20=>TemplateController.php:43] 用户未登录
+2017-01-02 06:26:45 [error][application][TemplateController.php:22=>TemplateController.php:43] failed to get template index
+
+

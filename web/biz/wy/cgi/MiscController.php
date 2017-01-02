@@ -47,4 +47,24 @@ class MiscController extends RenderController {
 
 		return $this->renderJson($ret, $this->retdata);
 	}
+
+	private function _actionUploadImg()
+	{
+		$miscDAO = new MiscDAO();
+		$ret = $miscDAO->uploadImg($output);
+		if ($ret !== BizErrcode::ERR_OK) {
+			Yii::error('上传图片失败');
+			return $ret;
+		}
+
+		$this->retdata = $output;
+		return $ret;
+	}
+
+	public function actionUploadImg()
+	{
+		$ret = $this->_actionUploadImg();
+
+		return $this->renderJson($ret, $this->retdata);
+	}
 }

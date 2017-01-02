@@ -6,6 +6,7 @@ use component\model\BaseModel;
 use includes\BizErrcode;
 use includes\BizConst;
 use app\wy\ao\Captcha;
+use app\wy\ao\UploadImg;
 
 class MiscDAO extends BaseModel {
 
@@ -89,6 +90,21 @@ class MiscDAO extends BaseModel {
 		}
 
 		return BizErrcode::ERR_OK;
+	}
 
+	/**
+	 * 单张图片上传
+	 * @param  [array] &$output 图片访问地址，如 [picUrl=>'xxx']
+	 * @return [int] 错误码
+	 */
+	public function uploadImg(&$output = [])
+	{
+		$img = new UploadImg();
+		$ret = $img->upload($output);
+		if (BizErrcode::ERR_OK !== $ret) {
+			return BizErrcode::ERR_FAIL;
+		}
+
+		return BizErrcode::ERR_OK;
 	}
 }
