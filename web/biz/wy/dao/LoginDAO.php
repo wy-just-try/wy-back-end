@@ -29,7 +29,7 @@ class LoginDAO extends BaseModel
 	{
 		$scenarios = parent::scenarios();
 		$scenarios['register'] = ['account','passwd','name','cellPhone','mailUrl','landLine','verifyPic','verifyMsg'];
-		$scenarios['login'] = ['account', 'passwd', 'verifyPic'];
+		$scenarios['login'] = ['account', 'cellPhone', 'passwd', 'verifyPic'];
 		$scenarios['logout'] = ['name'];
 		$scenarios['repeat-register'] = ['account', 'cellPhone'];
 		$scenarios['find-password'] = ['cellPhone', 'verifyPic', 'verifyMsg'];
@@ -153,7 +153,15 @@ class LoginDAO extends BaseModel
 		// Fetch the user's account, password and username from db
 		$db_handler = Yii::$app->db->getSvcDb();
 
-		list($sql, $params) = $this->queryUserInfoByAccount();
+		if (isset($input['account']) && strlen($input['account']) > 0) {
+			list($sql, $params) = $this->queryUserInfoByAccount();
+		} elseif (isset($input['cellPhone']) && strlen($input['cellPhone']) > 0) {
+			list($sql, $params) = $this->queryUserInfoByCellphone();
+		} else {
+			Yii::error("There is no account or cellPhone parameter in the input parameters");
+			return BizErrcode::ERR_PARAM;
+		}
+		
 		Yii::trace("query sql: $sql");
 		$ret = $db_handler->getAll($sql, $params);
 		if (FALSE == $ret) {
@@ -251,7 +259,7 @@ class LoginDAO extends BaseModel
 	}
 
 	private function queryUserInfoByCellphone() {
-		$sql = "select Account, UserName from $this->login_db_table where CellPhone=:cellphone";
+		$sql = "select Account, Passwd, UserName from $this->login_db_table where CellPhone=:cellphone";
 		$param[':cellphone'] = $this->cellPhone;
 
 		return [$sql, $param];
