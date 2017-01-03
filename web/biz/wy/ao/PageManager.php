@@ -268,7 +268,7 @@ class PageManager {
 
 	private function getPageInfoSql($account, $shortUrl) {
 
-		$sql = "SELECT PageName, PageDesc, DestUrl from {$this->PAGE_TABLE} WHERE Account=:account AND DestUrl=:shortUrl";
+		$sql = "SELECT PageName, PageDesc, DestUrl from {$this->PAGE_TABLE} WHERE Account=:account AND DestUrl=:shortUrl AND DeleteFlag='0'";
 		$params[':account'] = $account;
 		$params[':shortUrl'] = $shortUrl;
 
@@ -290,7 +290,7 @@ class PageManager {
 	}
 
 	private function getAllPageInfoSql($account) {
-		$sql = "SELECT PageName, PageDesc, DestUrl from {$this->PAGE_TABLE} WHERE Account=:account";
+		$sql = "SELECT PageName, PageDesc, DestUrl from {$this->PAGE_TABLE} WHERE Account=:account AND DeleteFlag='0'";
 		$params[':account'] = $account;
 
 		return [$sql, $params];
@@ -310,7 +310,7 @@ class PageManager {
 	}
 
 	private function deletePageInfoSql($account, $shortUrl) {
-		$sql = "DELETE FROM {$this->PAGE_TABLE} WHERE DestUrl=:shortUrl AND Account=:account";
+		$sql = "UPDATE {$this->PAGE_TABLE} SET DeleteFlag='1' WHERE DestUrl=:shortUrl AND Account=:account";
 		$params[':account'] = $account;
 		$params[':shortUrl'] = $shortUrl;
 

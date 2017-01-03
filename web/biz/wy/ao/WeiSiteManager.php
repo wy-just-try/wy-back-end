@@ -248,42 +248,6 @@ class WeiSiteManager {
 		return $shortUrl;
 	}
 
-	// private const SINA_APP_KEY = '4262014387';
-
-	/**
-	 * 使用新浪微博服务转换长链接和短链接
-	 * @param bool $trye true表示将长链接转换成短链接; false表示将短链接恢复成长链接
-	 * @param string $url 要操作的链接
-	 * @return 如果成功返回生成的链接，否则返回null
-	*/
-	// private function convertUrlBySina($type,$url){
-	//     if($type) {
-	//     	$baseurl = 'http://api.t.sina.com.cn/short_url/shorten.json?source='.self::SINA_APP_KEY.'&url_long='.$url;
-	//     }
-	//     else {
-	//     	$baseurl = 'http://api.t.sina.com.cn/short_url/expand.json?source='.self::SINA_APP_KEY.'&url_short='.$url;
-	//     }
-
-	//     $ch=curl_init();
-	//     curl_setopt($ch, CURLOPT_URL,$baseurl);
-	//     curl_setopt($ch, CURLOPT_HEADER, 0);
-	//     curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-	//     curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
-	//     $strRes=curl_exec($ch);
-	//     curl_close($ch);
-	//     $arrResponse=json_decode($strRes,true);
-	//     if (isset($arrResponse->error) || !isset($arrResponse[0]['url_long']) || $arrResponse[0]['url_long'] == '') {
-	//     	return null;
-	// 	}
-
-	//     if($type) {
-	//     	return $arrResponse[0]['url_short'];
-	//     }
-	//     else {
-	//     	return $arrResponse[0]['url_long'];
-	//     }
- //    }
-
 	/**
 	 * 将微网站添加到数据库中
 	*/
@@ -487,8 +451,13 @@ class WeiSiteManager {
 		return $pagePath;
 	}
 
+	/**
+	 * 用来获取此账户下所有没有被删除的微网站信息
+	 * @param string $account 要获取的微网站所属的账户名
+	 * @return 
+	*/
 	private function getAllWeiSitesSql($account) {
-		$sql = "SELECT WeiName, WeiPic, WeiText, DestUrl FROM $this->WEI_SITE_DB where Account=:account";
+		$sql = "SELECT WeiName, WeiPic, WeiText, DestUrl FROM $this->WEI_SITE_DB where Account=:account AND DeleteFlag='0'";
 		$params[':account'] = $account;
 
 		return [$sql, $params];
@@ -512,8 +481,14 @@ class WeiSiteManager {
 		return $ret;
 	}
 
+	/**
+	 * 用来删除此账户下的微网站，实际只是将此微网站的DeleteFlag设置成1
+	 * @param string $account 要删除的微网站所属账户
+	 * @param string $shortUrl 要删除的微网站所对应的首页短链接
+	 * @return 
+	*/
 	private function deletWeiSiteSql($account, $shortUrl) {
-		$sql = "DELETE FROM $this->WEI_SITE_DB WHERE Account=:account AND DestUrl=:shortUrl";
+		$sql = "UPDATE $this->WEI_SITE_DB SET DeleteFlag='1' WHERE Account=:account AND DestUrl=:shortUrl";
 		$params[':account'] = $account;
 		$params[':shortUrl'] = $shortUrl;
 
