@@ -29,7 +29,7 @@ class LoginController extends RenderController
 		$LoginDao = new LoginDAO();
 		$ret = $LoginDao->register($input, $output);
 		if (BizErrcode::ERR_OK != $ret) {
-			Yii::error('注册用户失败');
+			Yii::error('Failed to register');
 			return $ret;
 		}
 
@@ -61,11 +61,11 @@ class LoginController extends RenderController
 		$loginDao = new LoginDAO();
 		$ret = $loginDao->login($input, $output);
 		if (BizErrcode::ERR_OK != $ret) {
-			Yii::error('登录失败');
+			Yii::error('Failed to login');
 			return $ret;
 		}
 
-		//$this->retdata['data'] = $output;
+		$this->retdata['data'] = $output;
 
 		return $ret;
 	}
@@ -92,9 +92,11 @@ class LoginController extends RenderController
 		$loginDao = new LoginDAO();
 		$ret = $loginDao->logOut($input, $output);
 		if (BizErrcode::ERR_OK != $ret) {
-			Yii::error('退出登录失败');
+			Yii::error('Failed to logout');
 			return $ret;
 		}
+
+		$this->retdata['data'] = $output;
 
 		return $ret;
 
@@ -120,10 +122,8 @@ class LoginController extends RenderController
 
 		$loginDao = new LoginDAO();
 		$ret = $loginDao->checkRegistered($input, $output);
-		if (BizErrcode::ERR_OK != $ret) {
-			Yii::error('检查是否注册的参数错误');
-			return $ret;
-		}
+
+		$this->retdata['data'] = $output;
 
 		return $ret;
 	}
@@ -150,10 +150,10 @@ class LoginController extends RenderController
 		$loginDao = new LoginDAO();
 		$ret = $loginDao->findPassword($input, $output);
 		if ($ret != BizErrcode::ERR_OK) {
-			Yii::error('找回密码失败');
+			Yii::error('Failed to find password');
 			return $ret;
 		} else {
-			Yii::info('找回密码成功');
+			Yii::info('Success to find password');
 		}
 
 		$this->retdata['data'] = $output;
@@ -185,6 +185,8 @@ class LoginController extends RenderController
 			Yii::error('Failed to update password');
 			return $ret;
 		}
+
+		$this->retdata['data'] = $output;
 
 		return $ret;
 	}

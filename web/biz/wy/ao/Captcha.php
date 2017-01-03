@@ -88,7 +88,7 @@ class Captcha {
 
 			if (isset($_SESSION[self::PIC_CAPTCHA])) {
 				$realPicCaptcha = $_SESSION[self::PIC_CAPTCHA];
-				if (strncasecmp($realPicCaptcha, $picStr, self::PIC_CAPTCHA_LEN)) {
+				if (strncasecmp($realPicCaptcha, $picStr, self::PIC_CAPTCHA_LEN) == 0) {
 				//if ($_SESSION[self::PIC_CAPTCHA] === $picStr) {
 					// 需要清除session中保存的图片验证码，前台需要重新请求生成新的验证码
 					$_SESSION[self::PIC_CAPTCHA] = null;
@@ -121,7 +121,7 @@ class Captcha {
 
 			if (isset($_SESSION[self::MSG_CAPTCHA])) {
 				$realMsgCaptcha = $_SESSION[SELF::MSG_CAPTCHA];
-				if (strncasecmp($realMsgCaptch, $msgStr, self::MSG_CAPTCHA_LEN)) {
+				if (strncasecmp($realMsgCaptch, $msgStr, self::MSG_CAPTCHA_LEN) == 0) {
 				//if ($_SESSION[self::MSG_CAPTCHA] === $msgStr) {
 					// 清空session中的短信验证码
 					$_SESSION[self::MSG_CAPTCHA] = null;

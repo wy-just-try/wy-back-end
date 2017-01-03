@@ -78,7 +78,7 @@ class WeiSitesDAO extends BaseModel {
 
 		// Should check if this user is login
 		$loginBehavior = new LoginBehavior();
-		if ($loginBehavior->checkLogin() != BizErrcode::ERR_OK) {
+		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
 			Yii::info('This user does not login. Please login firstly');
 			//return BizErrcode::ERR_NOLOGIN;
 		}
@@ -110,7 +110,7 @@ class WeiSitesDAO extends BaseModel {
 
 		// Should check if this user is login
 		$loginBehavior = new LoginBehavior();
-		if ($loginBehavior->checkLogin() != BizErrcode::ERR_OK) {
+		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
 			Yii::info('User does not login. Please login firstly');
 			//return BizErrcode::ERR_NOLOGIN;
 		}

@@ -89,7 +89,7 @@ class LoginBehavior extends Behavior
 	 */
 	public function checkLogin()
 	{
-		session_start();
+		//session_start();
 
 		if (!isset($_COOKIE[self::loginToken()])) {
 			Yii::info('Failed to get loginToken cookie');
@@ -159,7 +159,7 @@ class LoginBehavior extends Behavior
 	public function initSessionAndCookie($userInfo) {
 
 		//session_name(self::sessName());
-		session_start();
+		//session_start();
 		$str = $this->randStr(30);
 		$_SESSION[self::sessName()] = $str;
 		$_SESSION[self::sessTimeout()] = time() + self::LOGIN_TIMEOUT;

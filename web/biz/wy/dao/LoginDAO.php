@@ -171,11 +171,9 @@ class LoginDAO extends BaseModel
 		foreach ($ret as $index => $values) {
 			// 前台会传md5后的数据，所以这里不用md5
 			//md5($input['passwd'])
-			if ($input['passwd'] != $values['Passwd']) {
+			if ($input['passwd'] == $values['Passwd']) {
 			//if (md5($input['passwd']) != $values['Passwd']) {
-				// Login successfully
-				Yii::trace("Successfully login");
-
+				Yii::info("The input password matches the real one");
 				// 生成loginBehavior，初始化session和cookie
 				$loginBehavior = new LoginBehavior();
 
@@ -186,6 +184,9 @@ class LoginDAO extends BaseModel
 				}
 
 				$loginBehavior->initSessionAndCookie($values);
+
+				// Login successfully
+				Yii::info("Successfully login");
 
 				return BizErrcode::ERR_OK;
 			}
@@ -219,7 +220,7 @@ class LoginDAO extends BaseModel
 
 		// Check if the user already login
 		$loginBehavior = new LoginBehavior();
-		if ($loginBehavior->checkLogin() != BizErrcode::ERR_OK) {
+		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
 			Yii::info('This user is not login');
 			return BizErrcode::ERR_OK;
 		}
@@ -250,7 +251,7 @@ class LoginDAO extends BaseModel
 	}
 
 	private function queryUserInfoByCellphone() {
-		$sql = "select Account, UserName from $this->login_db_table where Cellphone=:cellphone";
+		$sql = "select Account, UserName from $this->login_db_table where CellPhone=:cellphone";
 		$param[':cellphone'] = $this->cellPhone;
 
 		return [$sql, $param];
@@ -274,9 +275,9 @@ class LoginDAO extends BaseModel
 		foreach ($input as $key => $value) {
 			$sql = null;
 			$params = null;
-			if ($key === 'account') {
+			if ($key === 'account' && strlen($value) > 0) {
 				list($sql, $params) = $this->queryUserInfoByAccount();
-			} elseif ($key === 'cellPhone') {
+			} elseif ($key === 'cellPhone' && strlen($value) > 0) {
 				list($sql, $params) = $this->queryUserInfoByCellphone();
 			} else {
 				continue;
