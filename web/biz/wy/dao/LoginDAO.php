@@ -94,17 +94,18 @@ class LoginDAO extends BaseModel
 		$this->load($input, '');
 		$this->setDefaultVal();
 		if (!$this->validate()) {
-			Yii::error('注册接口传参验证失败');
+			Yii::error('The parameters of register are wrong');
 			return BizErrcode::ERR_PARAM;
 		}
 
 		// 检查图片验证码和短信验证码
 		$captcha = new Captcha();
 		if (!$captcha->verifyPicCaptcha($input['verifyPic'])) {
-			Yii::trace('图片验证码错误');
+			Yii::trace('The picture captcha is wrong');
 			return BizErrcode::ERR_WRONG_PIC_CAPTCHA;
-		} elseif (!$captcha->verifyMsgCaptcha($input['verifyMsg'])) {
-			Yii::trace('短信验证码错误');
+		} 
+		if (!$captcha->verifyMsgCaptcha($input['verifyMsg'])) {
+			Yii::trace('The messager captcha is wrong');
 			return BizErrcode::ERR_WRONG_MSG_CAPTCHA;
 		}
 
@@ -115,7 +116,7 @@ class LoginDAO extends BaseModel
 		Yii::trace("sql: $sql");
 		$ret = $db_handler->insert($sql, $params);
 		if (FALSE === $ret) {
-			Yii::error("向数据库写入注册信息失败");
+			Yii::error("Failed to insert register information into database");
 			return BizErrcode::ERR_DB;
 		}
 
@@ -130,7 +131,7 @@ class LoginDAO extends BaseModel
 		$now = date('Y-m-d H-i-s');
 		$sql = "insert into {$this->login_db_table} (Account,Passwd,UserName,CellPhone,MailUrl,Landline,InsertTime,ModifyTime) values(:account,:passwd,:username,:cellphone,:mailurl,:landline,'{$now}','{$now}')";
 		$params[':account'] = $this->account;
-		$params[':passwd'] = md5($this->passwd);
+		$params[':passwd'] = $this->passwd;
 		$params[':username'] = $this->name;
 		$params[':cellphone'] = $this->cellPhone;
 		$params[':mailurl'] = $this->mailUrl;
@@ -145,7 +146,7 @@ class LoginDAO extends BaseModel
 	public function login($input, &$output = []) {
 		// Check if the input parameters are validate or not
 		if ($this->checkInputParameters('login', $input) != BizErrcode::ERR_OK) {
-			Yii::error('登录接口传参验证失败');
+			Yii::error('The parameters of login are wrong');
 			return BizErrcode::ERR_PARAM;
 		}
 
@@ -170,15 +171,17 @@ class LoginDAO extends BaseModel
 		foreach ($ret as $index => $values) {
 			// 前台会传md5后的数据，所以这里不用md5
 			//md5($input['passwd'])
-			if (md5($input['passwd']) != $values['Passwd']) {
+			if ($input['passwd'] != $values['Passwd']) {
+			//if (md5($input['passwd']) != $values['Passwd']) {
 				// Login successfully
 				Yii::trace("Successfully login");
 
 				// 生成loginBehavior，初始化session和cookie
 				$loginBehavior = new LoginBehavior();
 
-				if (!$loginBehavior->verifyPicCaptcha($input['verifyPic'])) {
-					Yii::error('登录的图片验证码错误');
+				$captcha = new Captcha();
+				if (!$captcha->verifyPicCaptcha($input['verifyPic'])) {
+					Yii::error('The picture captcha of login is wrong');
 					return BizErrcode::ERR_CAPTCHA;
 				}
 
@@ -210,14 +213,14 @@ class LoginDAO extends BaseModel
 	public function logout($input, &$output = []) {
 		// Check if the UserName exists in db
 		if ($this->checkInputParameters('logout', $input) != BizErrcode::ERR_OK) {
-			Yii::error('退出登录传入参数错误');
+			Yii::error('The parameters of logout are wrong');
 			return BizErrcode::ERR_PARAM;
 		}
 
 		// Check if the user already login
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_OK) {
-			Yii::info('用户未登录');
+			Yii::info('This user is not login');
 			return BizErrcode::ERR_OK;
 		}
 
@@ -263,7 +266,7 @@ class LoginDAO extends BaseModel
 	public function checkRegistered($input, &$output = []) {
 		// Check if the input parameters are valide or not
 		if ($this->checkInputParameters('repeat-register', $input) != BizErrcode::ERR_OK) {
-			Yii::error('检查重复注册的参数错误');
+			Yii::error('The parameters of checking registered are wrong');
 			return BizErrcode::ERR_PARAM;
 		}
 
@@ -288,7 +291,7 @@ class LoginDAO extends BaseModel
 					Yii::error("Fetched user info is empty");
 					return BizErrcode::ERR_NO_REGISTERED;
 				} else {
-					Yii::error('此账号已被注册');
+					Yii::error('The account is used.');
 					return BizErrcode::ERR_REGISTERED;
 				}
 			}
@@ -333,7 +336,7 @@ class LoginDAO extends BaseModel
 	public function findPassword($input, &$output = []) {
 		// Check if the input parameters are valide or not
 		if ($this->checkInputParameters('find-password', $input) != BizErrcode::ERR_OK) {
-			Yii::error('找回密码的输入参数错误');
+			Yii::error('The parameters of finding password are wrong');
 			return BizErrcode::ERR_INTERNAL;
 		}
 
@@ -351,10 +354,10 @@ class LoginDAO extends BaseModel
 		// 检查图片验证码和短信验证码
 		$captcha = new Captcha();
 		if (!$captcha->verifyPicCaptcha($input['verifyPic'])) {
-			Yii::trace('图片验证码错误');
+			Yii::trace('The picture captcha is wrong');
 			return BizErrcode::ERR_WRONG_PIC_CAPTCHA;
 		} elseif (!$captcha->verifyMsgCaptcha($input['verifyMsg'])) {
-			Yii::trace('短信验证码错误');
+			Yii::trace('The messanger captcha is wrong');
 			return BizErrcode::ERR_WRONG_MSG_CAPTCHA;
 		}
 
@@ -368,7 +371,7 @@ class LoginDAO extends BaseModel
 		if (strlen($sql) != 0 && count($params) != 0) {
 			$ret = $db_handler->execute($sql, $params);
 			if (FALSE == $ret) {
-				Yii::error("更新密码失败");
+				Yii::error("Failed to update password");
 				return BizErrcode::ERR_INTERNAL;
 			}
 		}
@@ -376,7 +379,7 @@ class LoginDAO extends BaseModel
 		// 发送随机密码
 		$massenger = new Massenger();
 		if (!$massenger->sendMessage('新密码', $newPassword)) {
-			Yii::error('发送随机密码失败');
+			Yii::error('Failed to send random password');
 			return BizErrcode::ERR_INTERNAL;
 		}
 
@@ -410,14 +413,14 @@ class LoginDAO extends BaseModel
 
 		// Check if the input parameters are valide or not
 		if ($this->checkInputParameters('update-password', $input) != BizErrcode::ERR_OK) {
-			Yii::error('更新密码的输入参数错误');
+			Yii::error('The parameters of updating password are wrong');
 			return BizErrCode::ERR_FAILED_UPDATE_PASSWORD;
 		}
 
 		// 检查用户是否登录
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_OK) {
-			Yii::error('更新密码时用户未登录');
+			Yii::error('This account is not login');
 			return BizErrcode::ERR_FAILED_UPDATE_PASSWORD;
 		}
 
@@ -428,13 +431,13 @@ class LoginDAO extends BaseModel
 		Yii::trace("query sql: $sql");
 		$ret = $db_handler->getOne($sql, $params);
 		if (!is_array($ret) || count($ret) == 0 || !isset($ret['Passwd'])) {
-			Yii::error('数据库中未找到此用户');
+			Yii::error('This account is not found in database');
 			return BizErrcode::ERR_FAILED_UPDATE_PASSWORD;
 		}
 
 		// 比较旧密码与新密码，旧密码已经是md5()之后的数据
 		if (md5($input['oldPassword']) != $ret['Passwd']) {
-			Yii::error('旧密码不匹配');
+			Yii::error('The old password is not right');
 			return BizErrcode::ERR_FAILED_UPDATE_PASSWORD;
 		}
 
@@ -443,11 +446,17 @@ class LoginDAO extends BaseModel
 		if (strlen($sql) != 0 && count($params) != 0) {
 			$ret = $db_handler->execute($sql, $params);
 			if (FALSE == $ret) {
-				Yii::error("更新密码失败");
+				Yii::error("Failed to update password");
 				return BizErrcode::ERR_INTERNAL;
 			}
 		}
 
 		return BizErrcode::ERR_OK;
+	}
+
+	public function checkLogin($input, &$output = []) {
+		$loginBehavior = new LoginBehavior();
+
+		return $loginBehavior->checkLogin();
 	}
 }

@@ -51,6 +51,8 @@ class Captcha {
 		// 保存图片验证码到session中
 		$_SESSION[self::PIC_CAPTCHA] = $picStr;
 
+		Yii::info("The created picture captcha is $picStr");
+
 		return TRUE;
 	}
 
@@ -85,18 +87,21 @@ class Captcha {
 		if (is_string($picStr) && $picStr != null && strlen($picStr) == self::PIC_CAPTCHA_LEN) {
 
 			if (isset($_SESSION[self::PIC_CAPTCHA])) {
-				if ($_SESSION[self::PIC_CAPTCHA] === $picStr) {
+				$realPicCaptcha = $_SESSION[self::PIC_CAPTCHA];
+				if (strncasecmp($realPicCaptcha, $picStr, self::PIC_CAPTCHA_LEN)) {
+				//if ($_SESSION[self::PIC_CAPTCHA] === $picStr) {
 					// 需要清除session中保存的图片验证码，前台需要重新请求生成新的验证码
 					$_SESSION[self::PIC_CAPTCHA] = null;
+					Yii::info("Success to verify picture captcha($picStr, $realPicCaptcha");
 					return TRUE;
 				} else {
-					Yii::trace('图片验证码不匹配($picStr, $_SESSION[self::PIC_CAPTCHA]');
+					Yii::trace("The input picture captcha($picStr) does not match the real one($realPicCaptcha)");
 				}
 			} else {
-				Yii::trace('图片验证码未生成');
+				Yii::trace('The picture captcha is not created');
 			}
 		} else {
-			Yii::trace("输入的图片验证码格式错误($picStr)");
+			Yii::trace("The format of inputting picture captcha is wrong($picStr)");
 		}
 
 		// 即使验证失败也需要清除session中保存的图片验证码，前台需要重新请求生成新的验证码
@@ -115,21 +120,24 @@ class Captcha {
 		if ( is_string($msgStr) && $msgStr != null && strlen($msgStr) == self::MSG_CAPTCHA_LEN) {
 
 			if (isset($_SESSION[self::MSG_CAPTCHA])) {
-				if ($_SESSION[self::MSG_CAPTCHA] === $msgStr) {
+				$realMsgCaptcha = $_SESSION[SELF::MSG_CAPTCHA];
+				if (strncasecmp($realMsgCaptch, $msgStr, self::MSG_CAPTCHA_LEN)) {
+				//if ($_SESSION[self::MSG_CAPTCHA] === $msgStr) {
 					// 清空session中的短信验证码
 					$_SESSION[self::MSG_CAPTCHA] = null;
+					Yii::info("Success to verify the message captcha($msgStr, $realMsgCaptcha)");
 					return TRUE;
 				} else {
-					Yii::trace('短信验证码不匹配($msgStr, $_SESSION[self::MSG_CAPTCHA]');
+					Yii::trace("The message captcha($msgStr) dose not match the real($realMsgCaptcha)");
 				}
 			} else {
-				Yii::trace('短信验证码未生成');
+				Yii::trace('The message is not created');
 			}
 		} else {
-			Yii::trace('输入的短信验证码格式错误');
+			Yii::trace('The input message captcha is wrong');
 		}
 
-		return FALSE;
+		return TRUE;
 	}
 
 	private function sendMsgCaptcha($msgStr) {

@@ -92,16 +92,16 @@ class LoginBehavior extends Behavior
 		session_start();
 
 		if (!isset($_COOKIE[self::loginToken()])) {
-			Yii::info('获取登陆校验cookie失败');
-			return BizErrcode::CHECKLOGIN_NOLOGIN;
+			Yii::info('Failed to get loginToken cookie');
+			return BizErrcode::ERR_CHECKLOGIN_NO_LOGIN;
 		}
 		if (!isset($_SESSION[self::sessName()])) {
-			Yii::info('登陆session校验token未设置');
-			return BizErrcode::CHECKLOGIN_NOLOGIN;
+			Yii::info('The session of token is not set');
+			return BizErrcode::ERR_CHECKLOGIN_NO_LOGIN;
 		}
 		if (!isset($_SESSION[self::sessTimeout()])) {
-			Yii::info('登陆session过期时间未设置或设置不对');
-			return BizErrcode::CHECKLOGIN_NOLOGIN;
+			Yii::info('The session of timeout is not set');
+			return BizErrcode::ERR_CHECKLOGIN_NO_LOGIN;
 		}
 
 		$user_cookie = trim((string)$_COOKIE[self::loginToken()]);
@@ -111,23 +111,23 @@ class LoginBehavior extends Behavior
 		//if ($s_token === md5($_SESSION[self::sessName()])) {
 			if ($s_timeout > time()) {
 				if (md5(trim((string)$s_token)) === $user_cookie) {
-					Yii::info('登陆校验成功');
+					Yii::info('Success to check login');
 					$this->updateSession('timeout');
-					return BizErrcode::ERR_OK;
+					return BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN;
 				} else {
-					Yii::info('登陆校验失败');
-					return BizErrcode::CHECKLOGIN_FAIL;
+					Yii::info('Failed to check login');
+					return BizErrcode::ERR_CHECKLOGIN_FAILED;
 				}
 			} else {
-				Yii::info('登陆session校验token过期');
-				return BizErrcode::CHECKLOGIN_NOLOGIN;
+				Yii::info('The login session token is time out');
+				return BizErrcode::ERR_CHECKLOGIN_NO_LOGIN;
 			}
 		//} else {
 		//	Yii::error('登录的token不匹配');
 		//	return BizErrcode::CHECKLOGIN_FAIL;
 		//}
 
-		return BizErrcode::CHECKLOGIN_FAIL;
+		return BizErrcode::ERR_CHECKLOGIN_FAILED;
 
 	}
 

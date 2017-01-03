@@ -61,7 +61,7 @@ class MiscDAO extends BaseModel {
 		$this->load($input, '');
 		$this->setDefaultVal();
 		if (!$this->validate()) {
-			Yii::error('生成图片验证码参数错误');
+			Yii::error('The parameters of creating picture captcha are wrong');
 			return BizErrcode::ERR_PARAM;
 		}
 
@@ -79,13 +79,13 @@ class MiscDAO extends BaseModel {
 		$this->load($input, '');
 		$this->setDefaultVal();
 		if (!$this->validate()) {
-			Yii::error('生成短信验证码参数错误');
+			Yii::error('The parameters of create messanger captcha are wrong');
 			return BizErrcode::ERR_INVALID_CELLPHONE;
 		}
 
 		$msgCaptcha = new Captcha();
 		if (!$msgCaptcha->createMsgCaptcha()) {
-			Yii::error('发送短信验证码失败');
+			Yii::error('Failed to send message');
 			return BizErrcode::ERR_SEND_FAILED;
 		}
 

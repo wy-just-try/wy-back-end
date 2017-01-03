@@ -53,6 +53,10 @@ class LoginController extends RenderController
 
 		// 在数据库中查看此用户是否注册并比较password是否正确
 		$input = $this->GPValue();
+		foreach ($input as $key => $value) {
+			//echo "key=$key, value=$value"."<br>";
+			Yii::info("key=$key, value=$value");
+		}
 
 		$loginDao = new LoginDAO();
 		$ret = $loginDao->login($input, $output);
@@ -79,6 +83,10 @@ class LoginController extends RenderController
 	private function _actionLogout() {
 
 		$input = $this->GPValue();
+		foreach ($input as $key => $value) {
+			//echo "key=$key, value=$value"."<br>";
+			Yii::info("key=$key, value=$value");
+		}
 
 		//
 		$loginDao = new LoginDAO();
@@ -105,6 +113,10 @@ class LoginController extends RenderController
 	private function _actionCheckRegistered() {
 
 		$input = $this->GPValue();
+		foreach ($input as $key => $value) {
+			//echo "key=$key, value=$value"."<br>";
+			Yii::info("key=$key, value=$value");
+		}
 
 		$loginDao = new LoginDAO();
 		$ret = $loginDao->checkRegistered($input, $output);
@@ -129,6 +141,10 @@ class LoginController extends RenderController
 	private function _actionFindPassword() {
 
 		$input = $this->GPValue();
+		foreach ($input as $key => $value) {
+			//echo "key=$key, value=$value"."<br>";
+			Yii::info("key=$key, value=$value");
+		}
 
 		// 
 		$loginDao = new LoginDAO();
@@ -158,11 +174,15 @@ class LoginController extends RenderController
 	private function _actionUpdatePasswd() {
 
 		$input = $this->GPValue();
+		foreach ($input as $key => $value) {
+			//echo "key=$key, value=$value"."<br>";
+			Yii::info("key=$key, value=$value");
+		}
 
 		$loginDao = new LoginDAO();
 		$ret = $loginDao->updatePassword($input, $output);
 		if (BizErrcode::ERR_OK != $ret) {
-			Yii::error('更新密码失败');
+			Yii::error('Failed to update password');
 			return $ret;
 		}
 
@@ -175,6 +195,30 @@ class LoginController extends RenderController
 	public function actionUpdatePasswd() {
 
 		$ret = $this->_actionUpdatePasswd();
+
+		return $this->renderJson($ret, $this->retdata);
+	}
+
+	private function _actionCheckReLogin() {
+		$input = $this->GPValue();
+		foreach ($input as $key => $value) {
+			Yii::info("input[$key]: $value");
+		}
+
+		$loginDao = new LoginDAO();
+		$ret = $loginDao->checkLogin($input, $output);
+		if (BizErrcode::ERR_OK != $ret) {
+			Yii::error("Failed to check login");
+			return $ret;
+		}
+
+		$this->retdata['data'] = $output;
+
+		return $ret;
+	}
+
+	public function actionCheck() {
+		$ret = $this->_actionCheckReLogin();
 
 		return $this->renderJson($ret, $this->retdata);
 	}

@@ -39,6 +39,11 @@ class BizErrcode extends Errcode {
 	const ERR_NO_REGISTERED = 0; // 未注册
 	const ERR_REGISTERED = 1; // 已经注册
 
+	//登录校验返回状态
+	const ERR_CHECKLOGIN_ALREADY_LOGIN = 0;
+	const ERR_CHECKLOGIN_NO_LOGIN = 1;
+	const ERR_CHECKLOGIN_FAILED = 2;
+
 	//获取短信验证码的返回状态
 	const ERR_SEND_FAILED = 1; // 发送短信失败
 	const ERR_INVALID_CELLPHONE = 2; // 手机号码不合法
