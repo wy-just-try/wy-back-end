@@ -92,7 +92,7 @@ class PageDAO extends BaseModel {
 		// Should check if this user is login
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
-			Yii::info('用户未登录');
+			Yii::info('This account does not login');
 			//return BizErrcode::ERR_NOLOGIN;
 		}
 
@@ -174,7 +174,7 @@ class PageDAO extends BaseModel {
 		// Should check if this user is login
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
-			Yii::info('用户未登录');
+			Yii::info('This account does not login');
 			//return BizErrcode::ERR_NOLOGIN;
 		}
 
@@ -220,7 +220,7 @@ class PageDAO extends BaseModel {
 		// Should check if this user is login
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
-			Yii::info('用户未登录');
+			Yii::info('This account does not login');
 			return BizErrcode::ERR_NOLOGIN;
 		}
 
@@ -254,7 +254,7 @@ class PageDAO extends BaseModel {
 		// Should check if this user is login
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
-			Yii::info('用户未登录');
+			Yii::info('This account does not login');
 			//return BizErrcode::ERR_NOLOGIN;
 		}
 
@@ -287,7 +287,7 @@ class PageDAO extends BaseModel {
 		// Should check if this user is login
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
-			Yii::info('用户未登录');
+			Yii::info('This account does not login');
 			return BizErrcode::ERR_NOLOGIN;
 		}
 

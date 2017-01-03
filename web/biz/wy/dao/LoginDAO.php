@@ -95,7 +95,7 @@ class LoginDAO extends BaseModel
 		$this->setDefaultVal();
 		if (!$this->validate()) {
 			Yii::error('The parameters of register are wrong');
-			return BizErrcode::ERR_PARAM;
+			return BizErrcode::ERR_REGISTER_FAILED;
 		}
 
 		// 检查图片验证码和短信验证码
@@ -117,13 +117,13 @@ class LoginDAO extends BaseModel
 		$ret = $db_handler->insert($sql, $params);
 		if (FALSE === $ret) {
 			Yii::error("Failed to insert register information into database");
-			return BizErrcode::ERR_DB;
+			return BizErrcode::ERR_REGISTER_FAILED;
 		}
 
 		$output['account'] = $this->account;
 		$output['cellphone'] = $this->cellPhone;
 
-		return BizErrcode::ERR_OK;
+		return BizErrcode::ERR_REGISTER_OK;
 	}
 
 	private function register_sql()
@@ -188,7 +188,7 @@ class LoginDAO extends BaseModel
 				// Login successfully
 				Yii::info("Successfully login");
 
-				return BizErrcode::ERR_OK;
+				return BizErrcode::ERR_LOGIN_OK;
 			}
 		}
 
@@ -215,20 +215,20 @@ class LoginDAO extends BaseModel
 		// Check if the UserName exists in db
 		if ($this->checkInputParameters('logout', $input) != BizErrcode::ERR_OK) {
 			Yii::error('The parameters of logout are wrong');
-			return BizErrcode::ERR_PARAM;
+			return BizErrcode::ERR_LOGOUT_FAILED;
 		}
 
 		// Check if the user already login
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
 			Yii::info('This user is not login');
-			return BizErrcode::ERR_OK;
+			return BizErrcode::ERR_LOGOUT_OK;
 		}
 
 		// Clear session and cookie
 		$loginBehavior->uninitSessionAndCookie();
 
-		return BizErrcode::ERR_OK;
+		return BizErrcode::ERR_LOGOUT_OK;
 
 	}
 
@@ -318,7 +318,7 @@ class LoginDAO extends BaseModel
 	 * @param string $newPassword: 未进行过md5的密码
 	 */
 	private function updatePasswordSql($newPassword) {
-		$sql = "update $this->login_db_table set Passwd=:password where Cellphone=:cellphone";
+		$sql = "update $this->login_db_table set Passwd=:password where CellPhone=:cellphone";
 		$param[':password'] = md5($newPassword);
 		$param[':cellphone'] = $this->cellPhone;
 
@@ -357,7 +357,8 @@ class LoginDAO extends BaseModel
 		if (!$captcha->verifyPicCaptcha($input['verifyPic'])) {
 			Yii::trace('The picture captcha is wrong');
 			return BizErrcode::ERR_WRONG_PIC_CAPTCHA;
-		} elseif (!$captcha->verifyMsgCaptcha($input['verifyMsg'])) {
+		} 
+		if (!$captcha->verifyMsgCaptcha($input['verifyMsg'])) {
 			Yii::trace('The messanger captcha is wrong');
 			return BizErrcode::ERR_WRONG_MSG_CAPTCHA;
 		}
@@ -420,7 +421,7 @@ class LoginDAO extends BaseModel
 
 		// 检查用户是否登录
 		$loginBehavior = new LoginBehavior();
-		if ($loginBehavior->checkLogin() != BizErrcode::ERR_OK) {
+		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
 			Yii::error('This account is not login');
 			return BizErrcode::ERR_FAILED_UPDATE_PASSWORD;
 		}
@@ -437,7 +438,7 @@ class LoginDAO extends BaseModel
 		}
 
 		// 比较旧密码与新密码，旧密码已经是md5()之后的数据
-		if (md5($input['oldPassword']) != $ret['Passwd']) {
+		if ($input['oldPassword'] != $ret['Passwd']) {
 			Yii::error('The old password is not right');
 			return BizErrcode::ERR_FAILED_UPDATE_PASSWORD;
 		}

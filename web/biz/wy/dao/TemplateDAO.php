@@ -85,14 +85,14 @@ class TemplateDAO extends BaseModel {
 
 	public function getTemplateIndex($input, &$output = []) {
 		if ($this->checkInputParameters('get-temp-index', $input) != BizErrcode::ERR_OK) {
-			Yii::error('获取模板索引传入的参数错误');
+			Yii::error('The parameters of geting template index are wrong');
 			return BizErrcode::ERR_FAILED;
 		}
 
 		// Should check if this user is login
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
-			Yii::info('用户未登录');
+			Yii::info('This account does not login');
 			return BizErrcode::ERR_NOLOGIN;
 		}
 
@@ -123,14 +123,14 @@ class TemplateDAO extends BaseModel {
 	 */
 	public function genTemp($input, &$output = []) {
 		if ($this->checkInputParameters('gen-temp', $input) != BizErrcode::ERR_OK) {
-			Yii::error('生成模板传入的参数错误');
+			Yii::error('The parameters of creating template are wrong');
 			return BizErrcode::ERR_FAILED;
 		}
 
 		// Should check if this user is login
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
-			Yii::info('用户未登录');
+			Yii::info('This account does not login');
 			//return BizErrcode::ERR_NOLOGIN;
 		}
 
@@ -142,7 +142,7 @@ class TemplateDAO extends BaseModel {
 		$tempMgr = TemplateManager::getInstance();
 		$templateDirPath = $tempMgr->getTemplateDirPath($templateType, $templateId);
 		if (!is_string($templateDirPath) || strlen($templateDirPath) == 0) {
-			Yii::error('未找到模板ID对应的模板文件');
+			Yii::error('Not found the template corresponding to the template id');
 			return BizErrcode::ERR_FAILED;
 		}
 
@@ -161,17 +161,17 @@ class TemplateDAO extends BaseModel {
 		if ($templateType == 1) {
 			$url = $this->create1stPage($account, $templateDirPath);
 			if (is_null($url)) {
-				Yii::error("生成微网站首页失败");
+				Yii::error("Failed to create the first page of this weisite");
 				return BizErrcode::ERR_FAILED;
 			}
 		} else if ($templateType == 2) {
 			$url = $this->create2ndPage($account, $templateDirPath);
 			if (is_null($url)) {
-				Yii::error("生成微网站二级页面失败");
+				Yii::error("Failed to create the sub page of this weisite");
 				return BizErrcode::ERR_FAILED;
 			}
 		} else {
-			Yii::error("错误的模板类型($templateType)");
+			Yii::error("Wrong template type($templateType)");
 			return BizErrcode::ERR_FAILED;
 		}
 
@@ -191,7 +191,7 @@ class TemplateDAO extends BaseModel {
 		$weiSiteMgr = WeiSiteManager::getInstance();
 		$pageDir = $weiSiteMgr->create1stPageDir($account);
 		if (is_null($pageDir)) {
-			Yii::error("创建用户($account)的微网站首页目录失败");
+			Yii::error("Failed to create the first page of this account($account)'s weisite");
 			return null;
 		}
 
@@ -205,7 +205,7 @@ class TemplateDAO extends BaseModel {
 		//}
 		$pagePath = $weiSiteMgr->copyTemplate($templateDirPath, $pageDir);
 		if (is_null($pagePath)) {
-			Yii::error("复制$templatePath到$pageDir目录失败");
+			Yii::error("Failed to copy the directory from $templatePath to $pageDir");
 			return null;
 		}
 
@@ -213,14 +213,14 @@ class TemplateDAO extends BaseModel {
 		// 生成微网站首页的访问链接
 		$pageUrl = $weiSiteMgr->createPageUrl($pagePath);
 		if (is_null($pageUrl)) {
-			Yii::error("生成微网站首页的url失败: $pageDir");
+			Yii::error("Failed to create the weisite's url corresponding to the path($pageDir)");
 			return null;
 		}
 
 		// 生成访问的链接的短链接
 		$shortPageUrl = $weiSiteMgr->createShortUrl($pageUrl);
 		if (is_null($shortPageUrl)) {
-			Yii::error("生成微网站首页短链接失败: $pageUrl");
+			Yii::error("Failed to create the first page's short url corresponding to the url($pageUrl)");
 			return null;
 		}
 
@@ -228,7 +228,7 @@ class TemplateDAO extends BaseModel {
 		// 将微网站信息插入到数据库中
 		$ret = $weiSiteMgr->insertWeiSite($account, $pagePath, $pageUrl, $shortPageUrl);
 		if (FALSE == $ret) {
-			Yii::error("将微网站插入到数据库出错");
+			Yii::error("Failed to insert this weisite to database");
 			return null;
 		}
 
@@ -247,14 +247,14 @@ class TemplateDAO extends BaseModel {
 		$weiSiteMgr = WeiSiteManager::getInstance();
 		$pageDir = $weiSiteMgr->create2ndPageDir($account);
 		if (is_null($pageDir)) {
-			Yii::error("创建用户($account)的微网站首页目录失败");
+			Yii::error("Failed to create the first page's directory of the account($account)'s weisite");
 			return null;
 		}
 
 		// copy模板到微网站首页目录中
 		$pagePath = $weiSiteMgr->copyTemplate($templateDirPath, $pageDir);
 		if (is_null($pagePath)) {
-			Yii::error("复制$templatePath到$pageDir目录失败");
+			Yii::error("Failed to copy the directory from $templatePath to $pageDir");
 			return null;
 		}
 		//if (!copy($templteDirPath, $pageDir.basename($templteDirPath))){
@@ -265,48 +265,24 @@ class TemplateDAO extends BaseModel {
 		// 生成微网站首页的访问链接
 		$pageUrl = $weiSiteMgr->createPageUrl($pagePath);
 		if (is_null($pageUrl)) {
-			Yii::error("生成微网站子网页的url失败: $pagePath");
+			Yii::error("Failed to create the sub page's url corresponding to the path($pagePath)");
 			return null;
 		}
 
 		return $pageUrl;
 	}
 
-	private function testQcloudApi() {
-
-	    $config = array('SecretId'       => 'AKIDIzpZFhyJMCqIYcKEpJcmsmU4SdfXJbWG',
-		                'SecretKey'      => '31xkwztcsyyY0GKCvSs68mBVdZWIsFSo',
-		                'RequestMethod'  => 'GET',
-		                'DefaultRegion'  => 'gz');
-
-		$cvm = QcloudApi::load(QcloudApi::MODULE_CVM, $config);
-
-		$package = array('offset' => 0, 'limit' => 3);
-
-		$a = $cvm->DescribeInstances($package);
-		// $a = $cvm->generateUrl('DescribeInstances', $package);
-
-		if ($a === false) {
-		    $error = $cvm->getError();
-		    echo "Error code:" . $error->getCode() . ".\n";
-		    echo "message:" . $error->getMessage() . ".\n";
-		    echo "ext:" . var_export($error->getExt(), true) . ".\n";
-		} else {
-		    //var_dump($a);
-		}
-	}
-
 	public function updateTemplate($input, &$output = []) {
 
 		if ($this->checkInputParameters('update-template', $input) != BizErrcode::ERR_OK) {
-			Yii::error('更新模板传入的参数错误');
+			Yii::error('The parameters of updating template are wrong');
 			return BizErrcode::ERR_FAILED;
 		}
 
 		// Should check if this user is login
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
-			Yii::info('用户未登录');
+			Yii::info('This account does not login');
 			//return BizErrcode::ERR_NOLOGIN;
 		}
 
@@ -391,27 +367,27 @@ class TemplateDAO extends BaseModel {
 		// 在数据库中更新微网站信息
 		$weiSiteMgr = WeiSiteManager::getInstance();
 		if (BizErrcode::ERR_OK != $weiSiteMgr->updateWeiSiteInfo($account, $input['weiName'], $input['weiDesc'], $input['url'])) {
-			Yii::error("在数据库中更新微网站信息失败");
+			Yii::error("Failed to update the weisite information in database");
 			return BizErrcode::ERR_FAILED;
 		}
 
 		// 通过短链接从数据库中查找微网站首页在服务器上路径
 		$pagePath = $weiSiteMgr->get1stPagePath($account, $input['url']);
 		if (is_null($pagePath)) {
-			Yii::error("获取微网站首页路径出错");
+			Yii::error("Failed to get the first page's path of this weisite");
 			return BizErrcode::ERR_FAILED;
 		}
 
 		// 修改传递进来的网页内容
 		$content = $this->handlePageContent($input['content']);
 		if (is_null($content)) {
-			Yii::error("处理首页内容出错");
+			Yii::error("Failed to handle the first page's content");
 			return BizErrcode::ERR_FAILED;
 		}
 
 		// 将处理后的网页内容写到相应的文件中
 		if (false == $this->updatePageContent($content, $pagePath)) {
-			Yii::error("更新$pagePath的内容出错");
+			Yii::error("Failed to update the first page's content");
 			return BizErrcode::ERR_FAILED;
 		}
 
@@ -438,22 +414,22 @@ class TemplateDAO extends BaseModel {
 		//打开文件
 		$handle = fopen($pagePath, "w");
 		if (FALSE == $handle) {
-			Yii::error("打开文件$pagePath失败");
+			Yii::error("Failed to open file($pagePath)");
 			return false;
 		}
 
 		$ret = fwrite($handle, $content);
 		if (FALSE == $ret) {
-			Yii::error("写文件$pagePath失败");
+			Yii::error("Failed to write file($pagePath)");
 			if (FALSE == fclose($handle)) {
-				Yii::error("关闭文件$pagePath失败");
+				Yii::error("Failed to close file($pagePath)");
 				return false;
 			}
 			return false;
 		}
 
 		if (FALSE == fclose($handle)) {
-			Yii::error("关闭文件$pagePath失败");
+			Yii::error("Failed to close file($pagePath)");
 			return false;
 		}
 
@@ -464,20 +440,20 @@ class TemplateDAO extends BaseModel {
 		// 通过链接子网页在服务器上路径
 		$pagePath = $weiSiteMgr->get2ndPagePath($account, $input['url']);
 		if (is_null($pagePath)) {
-			Yii::error("获取微网站首页路径出错");
+			Yii::error("Failed to get the first page's path of this weisite");
 			return BizErrcode::ERR_FAILED;
 		}
 
 		// 修改传递进来的网页内容
 		$content = $this->handlePageContent($input['content']);
 		if (is_null($content)) {
-			Yii::error("处理首页内容出错");
+			Yii::error("Failed to handle the sub page's content");
 			return BizErrcode::ERR_FAILED;
 		}
 
 		// 将处理后的网页内容写到相应的文件中
 		if (false == $this->updatePageContent($content, $pagePath)) {
-			Yii::error("更新$pagePath的内容出错");
+			Yii::error("Failed to update the $pagePath content");
 			return BizErrcode::ERR_FAILED;
 		}
 
@@ -486,14 +462,14 @@ class TemplateDAO extends BaseModel {
 
 	public function getTemplateUrl($input, &$output = []) {
 		if ($this->checkInputParameters('get-template-url', $input) != BizErrcode::ERR_OK) {
-			Yii::error('更新模板传入的参数错误');
+			Yii::error('The parameters of getting template url are wrong');
 			return BizErrcode::ERR_FAILED;
 		}
 
 		// Should check if this user is login
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
-			Yii::info('用户未登录');
+			Yii::info('This account does not login');
 			//return BizErrcode::ERR_NOLOGIN;
 		}
 
@@ -508,10 +484,10 @@ class TemplateDAO extends BaseModel {
 
 		$weiSiteMgr = WeiSiteManager::getInstance();
 		if ($weiSiteMgr->isOriginalUrl($url)) {
-			Yii::info("传入的是子网页链接$url");
+			Yii::info("The sub page url($url) is passed in");
 			$output['tempUrl'] = $url;
 		} else {
-			Yii::info("传入的是首页链接$url");
+			Yii::info("The first page's url($url) is passed in");
 			list($weiName, $weiDesc) = $weiSiteMgr->getWeiSiteInfoByShortUrl($account, $url);
 			$output['tempUrl'] = $url;
 			$output['desc'] = $weiDesc;

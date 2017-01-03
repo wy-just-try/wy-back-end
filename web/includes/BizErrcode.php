@@ -26,14 +26,20 @@ class BizErrcode extends Errcode {
 	const DIRTY_WORD_INPUT = 9; //输入数据含有敏感词汇
 
 	// 注册的返回状态
+	const ERR_REGISTER_OK 	    = 0;
 	const ERR_WRONG_PIC_CAPTCHA = 1;
 	const ERR_WRONG_MSG_CAPTCHA = 2;
-	const ERR_REGISTER          = 3;
+	const ERR_REGISTER_FAILED   = 3;
 
 	// 登录的返回状态
-	const ERR_NO_ACCOUNT = 1; //用户未注册
-	const ERR_PASSWORD = 2; //登录密码错误
-	const ERR_CAPTCHA = 3;  //登录的图片验证码错误
+	const ERR_LOGIN_OK			= 0;
+	const ERR_NO_ACCOUNT 		= 1; //用户未注册
+	const ERR_PASSWORD 			= 2; //登录密码错误
+	const ERR_CAPTCHA 			= 3;  //登录的图片验证码错误
+
+	// 退出登录的返回状态
+	const ERR_LOGOUT_OK			= 0;
+	const ERR_LOGOUT_FAILED		= 1;
 
 	//检查是否重复注册的返回状态
 	const ERR_NO_REGISTERED = 0; // 未注册
