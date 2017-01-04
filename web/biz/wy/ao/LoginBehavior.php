@@ -89,7 +89,17 @@ class LoginBehavior extends Behavior
 	 */
 	public function checkLogin()
 	{
-		session_start();
+		// start session first if it's not start
+		if (session_status() == PHP_SESSION_NONE) {
+			session_start();
+		}
+		/**
+		 * For versions of PHP < 5.4.0
+			if (session_id() == '') {
+				session_start();
+			}
+		*/
+
 		$sessionName = session_name();
 		$sessionId = session_id();
 		Yii::info("Current session name: $sessionName, session id: $sessionId");
@@ -180,7 +190,17 @@ class LoginBehavior extends Behavior
 	public function initSessionAndCookie($userInfo) {
 
 		//session_name(self::sessName());
-		//session_start();
+		// start session first if it's not start
+		if (session_status() == PHP_SESSION_NONE) {
+			session_start();
+		}
+		/**
+		 * For versions of PHP < 5.4.0
+			if (session_id() == '') {
+				session_start();
+			}
+		*/
+			
 		$str = $this->randStr(30);
 		$_SESSION[self::sessName()] = $str;
 		$_SESSION[self::sessTimeout()] = time() + self::LOGIN_TIMEOUT;
@@ -209,6 +229,16 @@ class LoginBehavior extends Behavior
 		$sessionName = session_name();
 		$sessionId = session_id();
 		Yii::info("uninit session and cookie, session name: $sessionName, id: $sessionId");
+		// start session first if it's not start
+		if (session_status() == PHP_SESSION_NONE) {
+			session_start();
+		}
+		/**
+		 * For versions of PHP < 5.4.0
+			if (session_id() == '') {
+				session_start();
+			}
+		*/
 		$_SESSION[self::sessName()] = NULL;
 		$_SESSION[self::sessTimeout()] = NULL;
 		setcookie(self::loginAccout());
