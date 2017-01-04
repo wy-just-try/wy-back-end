@@ -15,7 +15,7 @@ class LoginBehavior extends Behavior
 	const LOGIN_USERNAME = 'username'; // 登录后获取的用户名
 	const LOGIN_SESSION_NAME = 'login';	//登录校验的session名称
 	const LOGIN_SESSION_TIMEOUT = 'login_timeout';	//过期时间的session名称
-	const LOGIN_TIMEOUT = 7200;	//登录token过期时间为7200秒
+	const LOGIN_TIMEOUT = 24*60*60;	//登录token过期时间为24小时 //7200秒
 
 	/**
 	 * [loginAccout description]
@@ -90,15 +90,25 @@ class LoginBehavior extends Behavior
 	public function checkLogin()
 	{
 		//session_start();
+		$sessionName = session_name();
+		Yii::info("Current session name: $sessionName");
 
+		$loginToken = self::loginToken();
+		Yii::info("Checking cookie[$loginToke]");
 		if (!isset($_COOKIE[self::loginToken()])) {
 			Yii::info('Failed to get loginToken cookie');
 			return BizErrcode::ERR_CHECKLOGIN_NO_LOGIN;
 		}
+
+		$sessName = self::sessName();
+		Yii::info("Checking _SESSION[$sessName]");
 		if (!isset($_SESSION[self::sessName()])) {
 			Yii::info('The session of token is not set');
 			return BizErrcode::ERR_CHECKLOGIN_NO_LOGIN;
 		}
+
+		$sessTime = self::sessTimeout();
+		Yii::info("Checking _SESSION[$sessTime]");
 		if (!isset($_SESSION[self::sessTimeout()])) {
 			Yii::info('The session of timeout is not set');
 			return BizErrcode::ERR_CHECKLOGIN_NO_LOGIN;
@@ -164,9 +174,11 @@ class LoginBehavior extends Behavior
 		$_SESSION[self::sessName()] = $str;
 		$_SESSION[self::sessTimeout()] = time() + self::LOGIN_TIMEOUT;
 		$_SESSION[self::loginAccout()] = $userInfo['Account'];
-		setcookie(self::loginAccout(), $userInfo['Account']);
-		setcookie(self::loginUserName(), $userInfo['UserName']);
-		setcookie(self::loginToken(), md5($str));
+		setcookie(self::loginAccout(), $userInfo['Account'], time() + self::LOGIN_TIMEOUT, "/");
+		setcookie(self::loginUserName(), $userInfo['UserName'], time() + self::LOGIN_TIMEOUT, "/");
+		setcookie(self::loginToken(), md5($str), time() + self::LOGIN_TIMEOUT, "/");
+		$sessionName = session_name();
+		Yii::info("init session and cookie, Current session name: $sessionName, sessName=$str");
 	}
 
 	/**
@@ -175,6 +187,8 @@ class LoginBehavior extends Behavior
 	 */
 	public function uninitSessionAndCookie() {
 		
+		$sessionName = session_name();
+		Yii::info("uninit session and cookie, session name: $sessionName");
 		$_SESSION[self::sessName()] = NULL;
 		$_SESSION[self::sessTimeout()] = NULL;
 		setcookie(self::loginAccout());
