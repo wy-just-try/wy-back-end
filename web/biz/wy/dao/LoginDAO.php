@@ -144,6 +144,21 @@ class LoginDAO extends BaseModel
 	}
 
 	/**
+	 * 通过用户账号或者手机号从数据库中查找对应的账号、用户、密码
+	 *
+	 */
+	private function queryUserInfoByAccountOrCellphone($loginName) {
+		if (preg_match('/^1\d{10}$/i', $loginName) == 1) {
+			$sql = "select Account, Passwd, UserName from $this->login_db_table where CellPhone=:account";
+		} else {
+			$sql = "select Account, Passwd, UserName from $this->login_db_table where Account=:account";
+		}
+		$params[':account'] = $loginName;
+
+		return [$sql, $params];
+	}
+
+	/**
 	 * 用来登录
 	 */
 	public function login($input, &$output = []) {
@@ -155,14 +170,9 @@ class LoginDAO extends BaseModel
 
 		// Fetch the user's account, password and username from db
 		$db_handler = Yii::$app->db->getSvcDb();
+		list($sql, $params) = $this->queryUserInfoByAccountOrCellphone($input['account']);
 
-		if (preg_match('/^1\d{10}$/i', $input['account']) == 1) {
-			list($sql, $params) = $this->queryUserInfoByCellphone();
-		} else {
-			list($sql, $params) = $this->queryUserInfoByAccount();
-		}
-		$loginname = $input['account'];
-		
+		$loginname = $input['account'];		
 		Yii::trace("input login name: $loginname, query sql: $sql");
 		$ret = $db_handler->getAll($sql, $params);
 		if (FALSE == $ret) {
@@ -179,9 +189,7 @@ class LoginDAO extends BaseModel
 		// Check if the input password is matched the one from db
 		foreach ($ret as $index => $values) {
 			// 前台会传md5后的数据，所以这里不用md5
-			//md5($input['passwd'])
 			if ($input['passwd'] == $values['Passwd']) {
-			//if (md5($input['passwd']) != $values['Passwd']) {
 				Yii::info("The input password matches the real one");
 				// 生成loginBehavior，初始化session和cookie
 				$loginBehavior = new LoginBehavior();
