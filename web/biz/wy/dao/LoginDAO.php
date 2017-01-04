@@ -42,6 +42,9 @@ class LoginDAO extends BaseModel
 	public function rules()
 	{
 		return [
+			[['account'], 'match', 'pattern' => '/^[a-z]\w{5,17}$/i', 'on' => 'register'],
+			[['cellPhone'], 'match', 'pattern' => '/^1\d{10}$/i', 'on' => 'register'],
+			[['mailUrl'], 'email', 'on' => 'register'],
 			[['account','passwd','name','cellPhone','verifyPic','verifyMsg'],'required','on'=>'register'],
 			[['account', 'passwd', 'verifyPic'], 'required', 'on'=>'login'],
 			[['name'], 'required', 'on'=>'logout'],
@@ -153,16 +156,14 @@ class LoginDAO extends BaseModel
 		// Fetch the user's account, password and username from db
 		$db_handler = Yii::$app->db->getSvcDb();
 
-		if (isset($input['account']) && strlen($input['account']) > 0) {
-			list($sql, $params) = $this->queryUserInfoByAccount();
-		} elseif (isset($input['cellPhone']) && strlen($input['cellPhone']) > 0) {
+		if (preg_match('/^1\d{10}$/i', $input['account']) == 1) {
 			list($sql, $params) = $this->queryUserInfoByCellphone();
 		} else {
-			Yii::error("There is no account or cellPhone parameter in the input parameters");
-			return BizErrcode::ERR_PARAM;
+			list($sql, $params) = $this->queryUserInfoByAccount();
 		}
+		$loginname = $input['account'];
 		
-		Yii::trace("query sql: $sql");
+		Yii::trace("input login name: $loginname, query sql: $sql");
 		$ret = $db_handler->getAll($sql, $params);
 		if (FALSE == $ret) {
 			Yii::error("The user() doesn't exist");
