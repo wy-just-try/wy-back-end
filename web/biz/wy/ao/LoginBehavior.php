@@ -89,34 +89,40 @@ class LoginBehavior extends Behavior
 	 */
 	public function checkLogin()
 	{
-		//session_start();
+		session_start();
 		$sessionName = session_name();
-		Yii::info("Current session name: $sessionName");
+		$sessionId = session_id();
+		Yii::info("Current session name: $sessionName, session id: $sessionId");
 
 		$loginToken = self::loginToken();
-		Yii::info("Checking cookie[$loginToke]");
+		Yii::info("Checking cookie[$loginToken]");
 		if (!isset($_COOKIE[self::loginToken()])) {
-			Yii::info('Failed to get loginToken cookie');
+			Yii::info("The _COOKIE[$loginToken] is not set");
 			return BizErrcode::ERR_CHECKLOGIN_NO_LOGIN;
 		}
 
 		$sessName = self::sessName();
 		Yii::info("Checking _SESSION[$sessName]");
 		if (!isset($_SESSION[self::sessName()])) {
-			Yii::info('The session of token is not set');
+			Yii::info("The _SESSION[$sessName] is not set");
 			return BizErrcode::ERR_CHECKLOGIN_NO_LOGIN;
 		}
 
 		$sessTime = self::sessTimeout();
 		Yii::info("Checking _SESSION[$sessTime]");
 		if (!isset($_SESSION[self::sessTimeout()])) {
-			Yii::info('The session of timeout is not set');
+			Yii::info("The _SESSION[$sessTime] is not set");
 			return BizErrcode::ERR_CHECKLOGIN_NO_LOGIN;
 		}
 
 		$user_cookie = trim((string)$_COOKIE[self::loginToken()]);
 		$s_token = $_SESSION[self::sessName()];
 		$s_timeout = $_SESSION[self::sessTimeout()];
+		Yii::info("_COOKIE[$loginToken]=$user_cookie");
+		$s_token_md5 = md5($s_token);
+		Yii::info("_SESSION[$sessName]=$s_token, md5: $s_token_md5");
+		$nowTime = time();
+		Yii::info("_SESSION[$sessTime]=$s_timeout, now=$nowTime");
 
 		//if ($s_token === md5($_SESSION[self::sessName()])) {
 			if ($s_timeout > time()) {
@@ -159,6 +165,11 @@ class LoginBehavior extends Behavior
 		} else {
 			Yii::error(__FUNCTION__ . ' 调用传参错误');
 		}
+		$sessName = self::sessName();
+		$sessTime = self::sessTimeout();
+		$sessNameVal = $_SESSION[self::sessName()];
+		$sessTimeVal = $_SESSION[self::sessTimeout()];
+		Yii::info("update session $type, _SESSION[$sessName]=$sessNameVal, _SESSION[$sessTime]=$sessTimeVal");
 	}
 
 	/**
@@ -177,8 +188,16 @@ class LoginBehavior extends Behavior
 		setcookie(self::loginAccout(), $userInfo['Account'], time() + self::LOGIN_TIMEOUT, "/");
 		setcookie(self::loginUserName(), $userInfo['UserName'], time() + self::LOGIN_TIMEOUT, "/");
 		setcookie(self::loginToken(), md5($str), time() + self::LOGIN_TIMEOUT, "/");
+
 		$sessionName = session_name();
-		Yii::info("init session and cookie, Current session name: $sessionName, sessName=$str");
+		$sessionId = session_id();
+		$sessName = self::sessName();
+		$sessNameVal = $_SESSION[self::sessName()];
+		$sessTime = self::sessTimeout();
+		$sessTimeVal = $_SESSION[self::sessTimeout()];
+		$sessAccount = self::loginAccout();
+		$sessAccountVal = $_SESSION[self::loginAccout()];
+		Yii::info("init session and cookie, session name: $sessionName, id: $sessionId, _SESSION[$sessName]=$sessNameVal, _SESSION[$sessTime]=$sessTimeVal, _SESSION[$sessAccount]=$sessAccountVal");
 	}
 
 	/**
@@ -188,7 +207,8 @@ class LoginBehavior extends Behavior
 	public function uninitSessionAndCookie() {
 		
 		$sessionName = session_name();
-		Yii::info("uninit session and cookie, session name: $sessionName");
+		$sessionId = session_id();
+		Yii::info("uninit session and cookie, session name: $sessionName, id: $sessionId");
 		$_SESSION[self::sessName()] = NULL;
 		$_SESSION[self::sessTimeout()] = NULL;
 		setcookie(self::loginAccout());
