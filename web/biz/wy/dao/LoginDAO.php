@@ -49,7 +49,7 @@ class LoginDAO extends BaseModel
 			[['account', 'passwd', 'verifyPic'], 'required', 'on'=>'login'],
 			[['account'], 'required', 'on'=>'logout'],
 			[['cellPhone', 'verifyPic', 'verifyMsg'], 'required', 'on'=>'find-password'],
-			[['oldPassword', 'newPassword'], 'required', 'on'=>'update-password'],
+			[['oldPasswd', 'newPasswd'], 'required', 'on'=>'update-password'],
 		];
 	}
 
@@ -455,13 +455,13 @@ class LoginDAO extends BaseModel
 		}
 
 		// 比较旧密码与新密码，旧密码已经是md5()之后的数据
-		if ($input['oldPassword'] != $ret['Passwd']) {
+		if ($input['oldPasswd'] != $ret['Passwd']) {
 			Yii::error('The old password is not right');
 			return BizErrcode::ERR_FAILED_UPDATE_PASSWORD;
 		}
 
 		// update新密码到数据库
-		list($sql, $params) = $this->updatePasswordSqlByAccount($input['newPassword'], $_SESSION[LoginBehavior::loginAccout()]);
+		list($sql, $params) = $this->updatePasswordSqlByAccount($input['newPasswd'], $_SESSION[LoginBehavior::loginAccout()]);
 		if (strlen($sql) != 0 && count($params) != 0) {
 			$ret = $db_handler->execute($sql, $params);
 			if (FALSE == $ret) {
