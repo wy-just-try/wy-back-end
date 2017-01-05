@@ -15,7 +15,7 @@ class LoginBehavior extends Behavior
 	const LOGIN_USERNAME = 'username'; // 登录后获取的用户名
 	const LOGIN_SESSION_NAME = 'login';	//登录校验的session名称
 	const LOGIN_SESSION_TIMEOUT = 'login_timeout';	//过期时间的session名称
-	const LOGIN_TIMEOUT = 24*60*60;	//登录token过期时间为24小时 //7200秒
+	const LOGIN_TIMEOUT = 2*60*60;	//登录token过期时间为24小时 //7200秒
 
 	/**
 	 * [loginAccout description]
@@ -173,7 +173,7 @@ class LoginBehavior extends Behavior
 		} elseif ($type === 'timeout') {
 			$_SESSION[self::sessTimeout()] = time() + self::LOGIN_TIMEOUT;
 		} else {
-			Yii::error(__FUNCTION__ . ' 调用传参错误');
+			Yii::error(__FUNCTION__ . " wrong type: $type");
 		}
 		$sessName = self::sessName();
 		$sessTime = self::sessTimeout();
@@ -205,9 +205,9 @@ class LoginBehavior extends Behavior
 		$_SESSION[self::sessName()] = $str;
 		$_SESSION[self::sessTimeout()] = time() + self::LOGIN_TIMEOUT;
 		$_SESSION[self::loginAccout()] = $userInfo['Account'];
-		setcookie(self::loginAccout(), $userInfo['Account'], time() + self::LOGIN_TIMEOUT, "/");
-		setcookie(self::loginUserName(), $userInfo['UserName'], time() + self::LOGIN_TIMEOUT, "/");
-		setcookie(self::loginToken(), md5($str), time() + self::LOGIN_TIMEOUT, "/");
+		setcookie(self::loginAccout(), $userInfo['Account'], time() + 24*60*60, "/");
+		setcookie(self::loginUserName(), $userInfo['UserName'], time() + 24*60*60, "/");
+		setcookie(self::loginToken(), md5($str), time() + 24*60*60, "/");
 
 		$sessionName = session_name();
 		$sessionId = session_id();
