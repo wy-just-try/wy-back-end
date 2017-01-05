@@ -30,7 +30,7 @@ class LoginDAO extends BaseModel
 		$scenarios = parent::scenarios();
 		$scenarios['register'] = ['account','passwd','name','cellPhone','mailUrl','landLine','verifyPic','verifyMsg'];
 		$scenarios['login'] = ['account', 'cellPhone', 'passwd', 'verifyPic'];
-		$scenarios['logout'] = ['name'];
+		$scenarios['logout'] = ['account'];
 		$scenarios['repeat-register'] = ['account', 'cellPhone'];
 		$scenarios['find-password'] = ['cellPhone', 'verifyPic', 'verifyMsg'];
 		$scenarios['update-password'] = ['oldPassword', 'newPassword'];
@@ -47,7 +47,7 @@ class LoginDAO extends BaseModel
 			[['mailUrl'], 'email', 'on' => 'register'],
 			[['account','passwd','name','cellPhone','verifyPic','verifyMsg'],'required','on'=>'register'],
 			[['account', 'passwd', 'verifyPic'], 'required', 'on'=>'login'],
-			[['name'], 'required', 'on'=>'logout'],
+			[['account'], 'required', 'on'=>'logout'],
 			[['cellPhone', 'verifyPic', 'verifyMsg'], 'required', 'on'=>'find-password'],
 			[['oldPassword', 'newPassword'], 'required', 'on'=>'update-password'],
 		];
