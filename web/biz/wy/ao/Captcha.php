@@ -56,7 +56,7 @@ class Captcha {
 		return TRUE;
 	}
 
-	public function createMsgCaptcha() {
+	public function createMsgCaptcha($tel) {
 
 		session_start();
 
@@ -65,7 +65,7 @@ class Captcha {
 		Yii::info("messanger captcha: $msg");
 
 		// 通过短信发送随机数
-		$this->sendMsgCaptcha($msg);
+		$this->sendMsgCaptcha($tel, "短信验证码：".$msg);
 
 		// 保存短信验证码到session中
 		$_SESSION[self::MSG_CAPTCHA] = $msg;
@@ -140,10 +140,10 @@ class Captcha {
 		return TRUE;
 	}
 
-	private function sendMsgCaptcha($msgStr) {
-		$massenger = new Massenger();
+	private function sendMsgCaptcha($tel, $msgStr) {
+		$massenger = Massenger::getInstance();
 
-		$massenger->sendMessage('短信验证码', $msgStr);
+		$massenger->sendMessage($tel, $msgStr);
 	}
 
 	/**

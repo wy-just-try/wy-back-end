@@ -383,7 +383,7 @@ class LoginDAO extends BaseModel
 		// 生成随机密码
 		$newPassword = $this->randStr();
 		$md5password = md5($newPassword);
-		Yii::info("new random password: $md5password");
+		Yii::info("new random password: $newPassword => $md5password");
 
 		// update新密码到数据库
 		list($sql, $params) = $this->updatePasswordSql($newPassword);
@@ -396,8 +396,8 @@ class LoginDAO extends BaseModel
 		}
 
 		// 发送随机密码
-		$massenger = new Massenger();
-		if (!$massenger->sendMessage('新密码', $newPassword)) {
+		$massenger = Massenger::getInstance();
+		if (!$massenger->sendMessage($input['cellPhone'], "新密码：".$newPassword)) {
 			Yii::error('Failed to send random password');
 			return BizErrcode::ERR_INTERNAL;
 		}

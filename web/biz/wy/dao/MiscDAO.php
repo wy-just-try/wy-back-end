@@ -84,7 +84,7 @@ class MiscDAO extends BaseModel {
 		}
 
 		$msgCaptcha = new Captcha();
-		if (!$msgCaptcha->createMsgCaptcha()) {
+		if (!$msgCaptcha->createMsgCaptcha($input['cellPhone'])) {
 			Yii::error('Failed to send message');
 			return BizErrcode::ERR_SEND_FAILED;
 		}
