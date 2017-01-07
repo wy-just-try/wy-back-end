@@ -15,7 +15,6 @@ class QcloudSms {
     private function __construct() {
     	$this->singleSender = new SmsSender($this->appid, $this->appkey);
     	Yii::info("QcludSms construct is called");
-    	//$this->singleSender = QcloudApi::load("cvm");
     }
 
     public static function getInstance() {
@@ -35,9 +34,9 @@ class QcloudSms {
     	try {
     		Yii::info("sendSms $tel, $content");
 		    $result = $this->singleSender->send(0, "86", $tel, $content, "", "");
-		    var_dump($result);
+		    //var_dump($result);
 	    	$rsp = json_decode($result);
-	    	var_dump($rsp);
+	    	//var_dump($rsp);
 		}catch (\Exception $e) {
 		    Yii::error("Exception occurs in sendSms()");
 		    var_dump($e);
