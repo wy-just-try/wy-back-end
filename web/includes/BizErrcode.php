@@ -61,11 +61,19 @@ class BizErrcode extends Errcode {
 	const ERR_INTERNAL = 4;
 
 	//更新密码的返回状态
-	const ERR_FAILED_UPDATE_PASSWORD = 1;
+	const ERR_UPDATE_PASSWORD_OK = 0;
+	const ERR_WRONG_OLD_PASSWORD = 1;
+	const ERR_NOT_LOGIN = 2;
+	const ERR_UPDATE_PASSWORD_FAILED = 3;
 
 	//获取模板索引的返回状态
 	const ERR_NOLOGIN = 1;
 	const ERR_FAILED = 3;
+
+	// 发送短信的返回状态
+	const ERR_MSG_OK = 0;
+	const ERR_MSG_EXCEPTION = 1;
+	const ERR_MSG_FAILED = 2;
 
 
 	public static $errMsg = [

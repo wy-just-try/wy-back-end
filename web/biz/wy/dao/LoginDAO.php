@@ -385,6 +385,13 @@ class LoginDAO extends BaseModel
 		$md5password = md5($newPassword);
 		Yii::info("new random password: $newPassword => $md5password");
 
+		// 发送新密码
+		$massenger = Massenger::getInstance();
+		if (!$massenger->sendNewPassword($input['cellPhone'], $newPassword)) {
+			Yii::error('Failed to send random password');
+			return BizErrcode::ERR_INTERNAL;
+		}
+
 		// update新密码到数据库
 		list($sql, $params) = $this->updatePasswordSql($newPassword);
 		if (strlen($sql) != 0 && count($params) != 0) {
@@ -393,13 +400,6 @@ class LoginDAO extends BaseModel
 				Yii::error("Failed to update password");
 				return BizErrcode::ERR_INTERNAL;
 			}
-		}
-
-		// 发送随机密码
-		$massenger = Massenger::getInstance();
-		if (!$massenger->sendNewPassword($input['cellPhone'], $newPassword)) {
-			Yii::error('Failed to send random password');
-			return BizErrcode::ERR_INTERNAL;
 		}
 
 		return BizErrcode::ERR_OK;
@@ -433,14 +433,14 @@ class LoginDAO extends BaseModel
 		// Check if the input parameters are valide or not
 		if ($this->checkInputParameters('update-password', $input) != BizErrcode::ERR_OK) {
 			Yii::error('The parameters of updating password are wrong');
-			return BizErrCode::ERR_FAILED_UPDATE_PASSWORD;
+			return BizErrCode::ERR_UPDATE_PASSWORD_FAILED;
 		}
 
 		// 检查用户是否登录
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
 			Yii::error('This account is not login');
-			return BizErrcode::ERR_FAILED_UPDATE_PASSWORD;
+			return BizErrcode::ERR_NOT_LOGIN;
 		}
 
 		// 从数据库获取用户信息
@@ -451,13 +451,13 @@ class LoginDAO extends BaseModel
 		$ret = $db_handler->getOne($sql, $params);
 		if (!is_array($ret) || count($ret) == 0 || !isset($ret['Passwd'])) {
 			Yii::error('This account is not found in database');
-			return BizErrcode::ERR_FAILED_UPDATE_PASSWORD;
+			return BizErrcode::ERR_NOT_LOGIN;
 		}
 
 		// 比较旧密码与新密码，旧密码已经是md5()之后的数据
 		if ($input['oldPasswd'] != $ret['Passwd']) {
 			Yii::error('The old password is not right');
-			return BizErrcode::ERR_FAILED_UPDATE_PASSWORD;
+			return BizErrcode::ERR_WRONG_OLD_PASSWORD;
 		}
 
 		// update新密码到数据库
@@ -466,7 +466,7 @@ class LoginDAO extends BaseModel
 			$ret = $db_handler->execute($sql, $params);
 			if (FALSE == $ret) {
 				Yii::error("Failed to update password");
-				return BizErrcode::ERR_INTERNAL;
+				return BizErrcode::ERR_UPDATE_PASSWORD_FAILED;
 			}
 		}
 

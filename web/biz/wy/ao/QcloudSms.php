@@ -3,6 +3,7 @@ namespace app\wy\ao;
 
 use Yii;
 use component\qcloud\sms\SmsSender;
+use includes\BizErrcode;
 
 class QcloudSms {
 
@@ -37,9 +38,17 @@ class QcloudSms {
 		    //var_dump($result);
 	    	$rsp = json_decode($result);
 	    	//var_dump($rsp);
+	    	if ($rsp->{'result'} == 0) {
+	    		Yii::info("Success to send message");
+	    		return BizErrcode::ERR_MSG_OK;
+	    	} else {
+	    		Yii::error("Response: $result");
+	    		return BizErrcode::ERR_MSG_FAILED;
+	    	}
 		}catch (\Exception $e) {
 		    Yii::error("Exception occurs in sendSms()");
-		    var_dump($e);
+		    //var_dump($e);
+		    return BizErrcode::ERR_MSG_EXCEPTION;
 		}
     }
 }
