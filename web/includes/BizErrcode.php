@@ -68,12 +68,14 @@ class BizErrcode extends Errcode {
 
 	//获取模板索引的返回状态
 	const ERR_NOLOGIN = 1;
-	const ERR_FAILED = 3;
+	const ERR_GET_TEMPLATE_INDEX_FAILED = 2;
 
 	// 发送短信的返回状态
 	const ERR_MSG_OK = 0;
 	const ERR_MSG_EXCEPTION = 1;
 	const ERR_MSG_FAILED = 2;
+
+	const ERR_FAILED = 1;
 
 
 	public static $errMsg = [

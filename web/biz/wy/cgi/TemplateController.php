@@ -27,11 +27,11 @@ class TemplateController extends RenderController {
 
 		if (is_array($output)) {
 			foreach ($output as $key => $values) {
-				$name = $values['FileName'];
-				$title = $values['Title'];
-				$desc = $values['Description'];
-				$picUrl = $values['ShowPic'];
-				Yii::info("$name, $title, $desc, $picUrl");
+				if (is_array($values)) {
+					foreach ($values as $index => $value) {
+						Yii::info("$value");
+					}
+				}
 			}
 		}
 

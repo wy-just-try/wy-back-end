@@ -9,8 +9,9 @@ class WeiSiteManager {
 	
 	private $WEI_SITE_DB = 'WeiNetInfo';
 
-	const WEI_SITES_LOCAL_ROOT_DIR = '/Users/apple/software/project/workspace/wy/src/wy-back-end/web/weisites/';
-	const WEI_SITES_URL_ROOT_DIR = 'http://wy626.com/weisites/';
+	//const WEI_SITES_LOCAL_ROOT_DIR = '/Users/apple/software/project/workspace/wy/src/wy-back-end/web/weisites/';
+	const WEI_SITES_LOCAL_ROOT_DIR = '/data/back/web/weisites/';
+	const WEI_SITES_URL_ROOT_DIR = 'http://wy626.com/web/weisites/';
 	const FIRST_PAGE_DIR = '1st/';
 	const SECOND_PAGE_DIR = '2nd/';
 
@@ -98,7 +99,7 @@ class WeiSiteManager {
 		Yii::info("The account($account)'s wei-site directory is $lastWeiSitePath");
 		if (!mkdir($lastWeiSitePath, 0777, true)) {
 			Yii::error("Failed to create the wei-site directory: $lastWeiSitePath");
-			return BizErrcode::ERR_FAILED;
+			return null;
 		}
 
 		return $lastWeiSitePath;
@@ -189,7 +190,7 @@ class WeiSiteManager {
 		$weiSiteDir = $weiSiteUserDir.$weiSiteDirs[$num]."/";
 
 		Yii::info("Found the editing wei-site directory: $weiSiteDir");
-		return $weisiteDir;
+		return $weiSiteDir;
 	}
 
 	public function create2ndPageDir($account) {
@@ -200,13 +201,19 @@ class WeiSiteManager {
 			return null;
 		}
 
-		// 创建首页目录
+		Yii::info("Found wei-site dir: $weiSiteDir");
+
+		// 创建子页面目录
 		if (!file_exists($weiSiteDir.self::SECOND_PAGE_DIR) || !is_dir($weiSiteDir.self::SECOND_PAGE_DIR)) {
 			if (!mkdir($weiSiteDir.self::SECOND_PAGE_DIR, 0777)) {
 				Yii::error("Failed to create the account($account)'s wei-site's sub page directory: $weiSiteDir/self::SECOND_PAGE_DIR");
 				return null;
+			} else {
+				Yii::info("Success to create the account($account)'s wei-site's sub page directory: $weiSiteDir/self::SECOND_PAGE_DIR");
 			}
-		}
+		} else {
+			Yii::info("The account($account)'s wei-site sub page directory: $weiSiteDir/2nd exists");
+		} 
 
 		return $weiSiteDir.self::SECOND_PAGE_DIR;
 	}
@@ -475,7 +482,6 @@ class WeiSiteManager {
 			return FALSE;
 		} elseif (count($ret) == 0) {
 			Yii::error("This $account does not create any wei-site");
-			return FALSE;
 		}
 
 		return $ret;

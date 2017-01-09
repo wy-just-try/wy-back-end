@@ -142,7 +142,7 @@ class LoginBehavior extends Behavior
 					return BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN;
 				} else {
 					Yii::info('Failed to check login');
-					return BizErrcode::ERR_CHECKLOGIN_FAILED;
+					return BizErrcode::ERR_CHECKLOGIN_NO_LOGIN;
 				}
 			} else {
 				Yii::info('The login session token is time out');
@@ -168,8 +168,10 @@ class LoginBehavior extends Behavior
 		if ($type === 'all') {
 			$_SESSION[self::sessName()] = $str;
 			$_SESSION[self::sessTimeout()] = time() + self::LOGIN_TIMEOUT;
+			setcookie(self::loginToken(), md5($str), time() + 24*60*60, "/");
 		} elseif ($type === 'token') {
 			$_SESSION[self::sessName()] = $str;
+			setcookie(self::loginToken(), md5($str), time() + 24*60*60, "/");
 		} elseif ($type === 'timeout') {
 			$_SESSION[self::sessTimeout()] = time() + self::LOGIN_TIMEOUT;
 		} else {

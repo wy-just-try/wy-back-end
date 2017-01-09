@@ -93,7 +93,7 @@ class PageDAO extends BaseModel {
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
 			Yii::info('This account does not login');
-			//return BizErrcode::ERR_NOLOGIN;
+			return BizErrcode::ERR_NOLOGIN;
 		}
 
 		// 获取账户名
@@ -175,7 +175,7 @@ class PageDAO extends BaseModel {
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
 			Yii::info('This account does not login');
-			//return BizErrcode::ERR_NOLOGIN;
+			return BizErrcode::ERR_NOLOGIN;
 		}
 
 		// 获取账户名
@@ -255,7 +255,7 @@ class PageDAO extends BaseModel {
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
 			Yii::info('This account does not login');
-			//return BizErrcode::ERR_NOLOGIN;
+			return BizErrcode::ERR_NOLOGIN;
 		}
 
 		// 获取账户名
@@ -269,7 +269,7 @@ class PageDAO extends BaseModel {
 		$ret = $pageManager->getAllPageInfo($account);
 		if (FALSE == $ret) {
 			Yii::error("Failed to get the $account's page info");
-			return BizErrcode::ERR_FAILED;
+			//return BizErrcode::ERR_FAILED;
 		}
 
 		$output = $ret;

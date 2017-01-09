@@ -80,7 +80,7 @@ class WeiSitesDAO extends BaseModel {
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
 			Yii::info('This user does not login. Please login firstly');
-			//return BizErrcode::ERR_NOLOGIN;
+			return BizErrcode::ERR_NOLOGIN;
 		}
 
 		// 获取账户名
@@ -92,12 +92,20 @@ class WeiSitesDAO extends BaseModel {
 
 		$weiSiteMgr = WeiSiteManager::getInstance();
 		$ret = $weiSiteMgr->getAllWeiSites($account);
-		if (FALSE == $ret) {
+		if (is_array($ret) && count($ret) == 0) {
+			Yii::info("This account($account) doesnot create weisites");
+		} elseif (FALSE == $ret) {
 			Yii::error("Failed to get all of wei sites info of the $account");
 			return BizErrcode::ERR_FAILED;
 		}
 
-		$output = $ret;
+		// map $ret to $output
+		for ($i=0; $i < count($ret); $i++) { 
+			$output[$i]['weiName'] = $ret[$i]['WeiName'];
+			$output[$i]['weiPic'] = $ret[$i]['WeiPic'];
+			$output[$i]['weiText'] = $ret[$i]['WeiText'];
+			$output[$i]['destUrl'] = $ret[$i]['DestUrl'];
+		}
 
 		return BizErrcode::ERR_OK;
 	}
@@ -112,7 +120,7 @@ class WeiSitesDAO extends BaseModel {
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
 			Yii::info('User does not login. Please login firstly');
-			//return BizErrcode::ERR_NOLOGIN;
+			return BizErrcode::ERR_NOLOGIN;
 		}
 
 		// 获取账户名

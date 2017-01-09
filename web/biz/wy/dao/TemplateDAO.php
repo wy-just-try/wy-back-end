@@ -83,10 +83,12 @@ class TemplateDAO extends BaseModel {
 		return BizErrcode::ERR_OK;
 	}
 
+	const TEMPLATE_PIC_URL_ROOT_DIR = 'http://wy626.com/template/';
+
 	public function getTemplateIndex($input, &$output = []) {
 		if ($this->checkInputParameters('get-temp-index', $input) != BizErrcode::ERR_OK) {
 			Yii::error('The parameters of geting template index are wrong');
-			return BizErrcode::ERR_FAILED;
+			return BizErrcode::ERR_GET_TEMPLATE_INDEX_FAILED;
 		}
 
 		// Should check if this user is login
@@ -96,22 +98,33 @@ class TemplateDAO extends BaseModel {
 			return BizErrcode::ERR_NOLOGIN;
 		}
 
+		$templateType = $input['type'];
 		$tempMgr = TemplateManager::getInstance();
 		$ret = $tempMgr->queryAllTemplateInfo($templateType);
 		if (FALSE == $ret) {
 			Yii::error("Failed to get all template info, template type: $templateType");
-			return BizErrcode::ERR_FAILED;
+			return BizErrcode::ERR_GET_TEMPLATE_INDEX_FAILED;
 		}
 
+		// Convert picture path to url
 		foreach ($ret as $index => $values) {
 			$filename = $values['Id'];
 			$title = $values['Title'];
 			$description = $values['Description'];
 			$picUrl = $values['ShowPic'];
+			$values['ShowPic'] = self::TEMPLATE_PIC_URL_ROOT_DIR.$picUrl;
+			$picUrl = $values['ShowPic'];
+
 			Yii::info("$filename, $title, $description, $picUrl");
 		}
 
-		$output = $ret;
+		// Map the ret array to output array
+		for ($i=0; $i < count($ret); $i++) {
+			$output[$i]['name'] = $ret[$i]['Id'];
+			$output[$i]['title'] = $ret[$i]['Title'];
+			$output[$i]['desc'] = $ret[$i]['Description'];
+			$output[$i]['picUrl'] = self::TEMPLATE_PIC_URL_ROOT_DIR.$ret[$i]['ShowPic'];
+		}
 
 		return BizErrcode::ERR_OK;
 	}
@@ -183,7 +196,7 @@ class TemplateDAO extends BaseModel {
 	/**
 	 * 生成微网站首页
 	 * @param string $account 创建微网站的账户名
-	 * @param string $templateDirPath 创建微网站首页用到的模板文件夹路径
+	 * @param string $templateDirPath 创建微网站首页用到的模板文件夹在服务器上的绝对路径
 	 * @return 如果成功，则返回微网站首页的短链接；否则返回null
 	*/
 	private function create1stPage($account, $templateDirPath) {
@@ -241,13 +254,13 @@ class TemplateDAO extends BaseModel {
 	 * 1. 二级页面的生成，必须先生成一级页而
 	 * 2. 当前用户最新的微网站目录下，已经创建首页，并且没有二组页面
 	*/
-	private function create2ndPage($account, $templteDirPath) {
+	private function create2ndPage($account, $templateDirPath) {
 
 		// 创建微网站二级页面目录
 		$weiSiteMgr = WeiSiteManager::getInstance();
 		$pageDir = $weiSiteMgr->create2ndPageDir($account);
 		if (is_null($pageDir)) {
-			Yii::error("Failed to create the first page's directory of the account($account)'s weisite");
+			Yii::error("Failed to create the 2nd page's directory of the account($account)'s weisite");
 			return null;
 		}
 
@@ -437,6 +450,8 @@ class TemplateDAO extends BaseModel {
 	}
 
 	private function update2ndPage($account, $input) {
+		
+		$weiSiteMgr = WeiSiteManager::getInstance();
 		// 通过链接子网页在服务器上路径
 		$pagePath = $weiSiteMgr->get2ndPagePath($account, $input['url']);
 		if (is_null($pagePath)) {
@@ -470,7 +485,7 @@ class TemplateDAO extends BaseModel {
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
 			Yii::info('This account does not login');
-			//return BizErrcode::ERR_NOLOGIN;
+			return BizErrcode::ERR_FAILED;
 		}
 
 		$url = $input['url'];

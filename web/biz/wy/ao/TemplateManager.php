@@ -18,10 +18,11 @@ class TemplateManager {
 	 * FileName is obtained from database.
 	*/
 	// /data/front/html/template/
-	const TEMPLATE_PATH_ROOT_DIR = '/Users/apple/software/project/workspace/wy/src/wy-back-end/web/templates/';
+	const TEMPLATE_PATH_ROOT_DIR = '/data/front/html/template/';
 
 	// template directory path
 	// 
+	const TEMPLATE_PIC_URL_ROOT_DIR = 'http://wy626.com/template/';
 
 	private $db_template_index_table_name = 'TempIndex';
 
@@ -43,9 +44,9 @@ class TemplateManager {
 	}
 
 
-	private function queryTempIndexByType() {
-		$sql = "SELECT Id, Title, Description, ShowPic from $this->template_db where Type=:type";
-		$params[':type'] = $this->type;
+	private function queryTempIndexByType($type) {
+		$sql = "SELECT Id, Title, Description, ShowPic from $this->db_template_index_table_name where Type=:type";
+		$params[':type'] = $type;
 
 		return [$sql, $params];
 	}
@@ -59,7 +60,7 @@ class TemplateManager {
 		// Fetch the user's account, password and username from db
 		$db_handler = Yii::$app->db->getSvcDb();
 
-		list($sql, $params) = $this->queryTempIndexByType();
+		list($sql, $params) = $this->queryTempIndexByType($templateType);
 		Yii::trace("query sql: $sql");
 		$ret = $db_handler->getAll($sql, $params);
 		if (!is_array($ret)) {
@@ -74,7 +75,7 @@ class TemplateManager {
 	}
 
 	private function queryTemplatePath($templateType, $templateId) {
-		$sql = "SELECT Name, Path FROM $this->db_template_index_table_name WHERE Type=:type AND Id=:id";
+		$sql = "SELECT FileName FROM $this->db_template_index_table_name WHERE Type=:type AND Id=:id";
 		$params[':type'] = $templateType;
 		$params[':id'] = $templateId;
 
@@ -105,10 +106,10 @@ class TemplateManager {
 		$ret = $db_handler->getOne($sql, $params);
 		if (!is_array($ret) || count($ret) == 0) {
 			Yii::error("模板路径为空");
-			return BizErrcode::ERR_FAILED;
+			return null;
 		}
 
-		$path = self::TEMPLATE_PATH_ROOT_DIR.$ret['Name'];
+		$path = self::TEMPLATE_PATH_ROOT_DIR.$ret['FileName'];
 
 		return $path;
 	}

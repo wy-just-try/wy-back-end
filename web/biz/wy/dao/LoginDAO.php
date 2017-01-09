@@ -422,7 +422,7 @@ class LoginDAO extends BaseModel
 	 */
 	private function updatePasswordSqlByAccount($newPassword, $account) {
 		$sql = "update $this->login_db_table set Passwd=:password where Account=:account";
-		$param[':password'] = md5($newPassword);
+		$param[':password'] = $newPassword;
 		$param[':account'] = $account;
 
 		return [$sql, $param];
@@ -454,7 +454,7 @@ class LoginDAO extends BaseModel
 			return BizErrcode::ERR_NOT_LOGIN;
 		}
 
-		// 比较旧密码与新密码，旧密码已经是md5()之后的数据
+		// 比较输入的旧密码是否正确
 		if ($input['oldPasswd'] != $ret['Passwd']) {
 			Yii::error('The old password is not right');
 			return BizErrcode::ERR_WRONG_OLD_PASSWORD;

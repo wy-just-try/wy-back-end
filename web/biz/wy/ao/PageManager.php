@@ -7,8 +7,9 @@ use app\wy\ao\UrlConverter;
 
 class PageManager {
 	
-	const PAGE_LOCAL_ROOT_DIR = '/Users/apple/software/project/workspace/wy/src/wy-back-end/web/pages/';
-	const PAGE_URL_ROOT_DIR = 'http://wy626.com/pages/';
+	//const PAGE_LOCAL_ROOT_DIR = '/Users/apple/software/project/workspace/wy/src/wy-back-end/web/pages/';
+	const PAGE_LOCAL_ROOT_DIR = '/data/back/web/pages/';
+	const PAGE_URL_ROOT_DIR = 'http://wy626.com/web/pages/';
 	const PAGE_DIR_PREFIX = 'page_';
 	const PAGE_FILE_NAME = 'page.shtml';
 
@@ -103,7 +104,7 @@ class PageManager {
 		Yii::info("The account($account)'s page directory: $newPageDir");
 		if (!mkdir($newPageDir, 0777, true)) {
 			Yii::error("创建微网站目录失败$newPageDir");
-			return BizErrcode::ERR_FAILED;
+			return null;
 		}
 
 		return $newPageDir;
@@ -301,9 +302,11 @@ class PageManager {
 
 		list($sql, $params) = $this->getAllPageInfoSql($account);
 		$ret = $db_handler->getAll($sql, $params);
-		if(FALSE == $ret) {
+		if (!is_array($ret)) {
 			Yii::error("Failed to get all of page info of the account($account)");
 			return FALSE;
+		} elseif(count($ret) == 0) {
+			Yii::error("This account($account) does not create any page");
 		}
 
 		return $ret;
