@@ -77,6 +77,10 @@ class BizErrcode extends Errcode {
 
 	const ERR_FAILED = 1;
 
+	// 上传图片的返回状态
+	const ERR_UPLOAD_OK     = 0;
+	const ERR_UPLOAD_FAILED = 1;
+
 
 	public static $errMsg = [
 		'-5' => '免登录禁止写操作',

@@ -45,7 +45,7 @@ class WeiSiteManager {
 
 	/**
 	 * 在微网站目录下为此用户创建他自己的微网站目录
-	 * 创建成功后的微网站目录格式：{WEI_SITE_LOCAL_ROOT_DIR}{account name}/weisite_{number}/
+	 * 创建成功后的微网站目录格式：{WEI_SITES_LOCAL_ROOT_DIR}{account name}/weisite_{number}/
 	 * @param string $account： 账户名称
 	 * @return 如果成功，则返回此用户微网站的目录路径，并且此路径是绝对路径；否则返回null
 	*/
@@ -193,12 +193,29 @@ class WeiSiteManager {
 		return $weiSiteDir;
 	}
 
-	public function create2ndPageDir($account) {
+	/**
+	 * 用来生成子网页在服务器上的绝对路径，如果firstPageUrl不为null，就先用首页的url来
+	 * 生成子网页的绝对路径；否则用用户名来生成子网页的约绝对路径
+	 * @param string $account 生成子网页的用户名
+	 * @param string $firstPageUrl 子网页对应的首页url
+	 * @return 如果成功，返回子网页在服务器上的绝对路径；否则返回null
+	*/
+	public function create2ndPageDir($account, $firstPageUrl) {
 
-		$weiSiteDir = $this->getLatestAndActiveWeiSiteDir($account);
+		$weiSiteDir = null;
+		// 如果有给出微网站首页的url，则先用微网站的首页url来获取微网站目录在服务器上的绝对路径
+		if (!is_null($firstPageUrl)) {
+			$weiSiteDir = $this->getWeiSiteDirByUrl($firstPageUrl);
+			Yii::info("The wei-site directory is $weiSiteDir by url($firstPageUrl)");
+		}
+
+		// 如果微网站目录路径没有获取到，再获取一次
 		if (is_null($weiSiteDir)) {
-			Yii::error("Failed to obtain the account($account)'s wei-site directory");
-			return null;
+			$weiSiteDir = $this->getLatestAndActiveWeiSiteDir($account);
+			if (is_null($weiSiteDir)) {
+				Yii::error("Failed to obtain the account($account)'s wei-site directory");
+				return null;
+			}
 		}
 
 		Yii::info("Found wei-site dir: $weiSiteDir");
@@ -216,6 +233,134 @@ class WeiSiteManager {
 		} 
 
 		return $weiSiteDir.self::SECOND_PAGE_DIR;
+	}
+
+	/**
+	 * 通过微网站首页的url地址来获取微网站目录在服务器上的绝对路径
+	 * @param string $pageUrl 微网站首页的url，可以是短链接也可以是原始链接
+	 * @return 如果成功，再返回绝对路径；否则返回null
+	*/
+	public function getWeiSiteDirByUrl($pageUrl) {
+		$originalPageUrl = $pageUrl;
+		if (!$this->isOriginalUrl($pageUrl)) {
+			$originalPageUrl = UrlConverter::getInstance()->convertUrl(false, $pageUrl);
+			if (is_null($originalPageUrl)) {
+				Yii::error("Failed to convert the short url($pageUrl) to the original url");
+				return null;
+			}
+		}
+
+		// 检查原始链接是否正确
+		if (strncmp($originalPageUrl, self::WEI_SITES_URL_ROOT_DIR, strlen(self::WEI_SITES_URL_ROOT_DIR)) != 0) {
+			Yii::error("The page url is wrong: $originalPageUrl");
+			return null;
+		}
+
+		$tempPagePath = substr($originalPageUrl, strlen(self::WEI_SITES_URL_ROOT_DIR));
+		$account = strstr($tempPagePath, "/", TRUE);
+		if (FALSE == $account) {
+			Yii::error("The page url is invalid, no account: $originalPageUrl");
+			return null;
+		}
+
+		$tempPagePath = substr($tempPagePath, strlen($account) + 1);
+		$weisiteId = strstr($tempPagePath, "/", TRUE);
+		if (FALSE == $weisiteId || strncmp($weisiteId, "weisite_", strlen("weisite_")) != 0) {
+			Yii::error("The page url is invalid, wei-site id is wrong: $originalPageUrl");
+			return null;
+		}
+
+		$tempPagePath = substr($tempPagePath, strlen($weisiteId) + 1);
+		$pageType = strstr($tempPagePath, "/", TRUE);
+		if (FALSE == $pageType) {
+			Yii::error("The page url is invalid, no page type: $originalPageUrl");
+			return null;
+		} elseif (strncmp($pageType, self::FIRST_PAGE_DIR, strlen(self::FIRST_PAGE_DIR)-1) == 0
+			|| strncmp($pageType, self::SECOND_PAGE_DIR, strlen(self::SECOND_PAGE_DIR)-1) == 0) {
+
+		} else {
+			Yii::error("The page url is invalid, page type($pageType) is wrong: $originalPageUrl");
+			return null;
+		}
+
+		Yii::info("pageUrl: $pageUrl => $originalPageUrl => $account => $weisiteId => $pageType");
+
+		$weisiteDir = self::WEI_SITES_LOCAL_ROOT_DIR.$account."/".$weisiteId."/";
+
+		Yii::info("wei-site dir: $weiSiteDir");
+
+		return $weisiteDir;
+
+		// 生成微网站首页在服务器上的绝对路径
+		//$pagePath = self::WEI_SITES_LOCAL_ROOT_DIR.substr($originalPageUrl, strlen(self::WEI_SITES_URL_ROOT_DIR));
+
+		// 获取微网站目录的绝对路径
+		//$weisiteDir = strstr($pagePath, "/".self::FIRST_PAGE_DIR."/", TRUE);
+		//if ($weisiteDir == FALSE) {
+		//	Yii::error("Failed to find the wei-site directory of the first page($pagePath)");
+		//	return null;
+		//} else {
+		//	Yii::info("Found the wei-site directory $weisiteDir");
+		//}
+
+		//return $weisiteDir."/";
+	}
+
+	/**
+	 * 通过微网站网页的url地址来获取微网站网页目录在服务器上的绝对路径
+	 * @param string $pageUrl 微网站首页的url，可以是短链接也可以是原始链接
+	 * @return 如果成功，再返回绝对路径；否则返回null
+	*/
+	public function getWeiSitePageDirByUrl($pageUrl) {
+		$originalPageUrl = $pageUrl;
+		if (!$this->isOriginalUrl($pageUrl)) {
+			$originalPageUrl = UrlConverter::getInstance()->convertUrl(false, $pageUrl);
+			if (is_null($originalPageUrl)) {
+				Yii::error("Failed to convert the short url($pageUrl) to the original url");
+				return null;
+			}
+		}
+
+		// 检查原始链接是否正确
+		if (strncmp($originalPageUrl, self::WEI_SITES_URL_ROOT_DIR, strlen(self::WEI_SITES_URL_ROOT_DIR)) != 0) {
+			Yii::error("The page url is wrong: $originalPageUrl");
+			return null;
+		}
+
+		$tempPagePath = substr($originalPageUrl, strlen(self::WEI_SITES_URL_ROOT_DIR));
+		$account = strstr($tempPagePath, "/", TRUE);
+		if (FALSE == $account) {
+			Yii::error("The page url is invalid, no account: $originalPageUrl");
+			return null;
+		}
+
+		$tempPagePath = substr($tempPagePath, strlen($account) + 1);
+		$weisiteId = strstr($tempPagePath, "/", TRUE);
+		if (FALSE == $weisiteId || strncmp($weisiteId, "weisite_", strlen("weisite_")) != 0) {
+			Yii::error("The page url is invalid, wei-site id is wrong: $originalPageUrl");
+			return null;
+		}
+
+		$tempPagePath = substr($tempPagePath, strlen($weisiteId) + 1);
+		$pageType = strstr($tempPagePath, "/", TRUE);
+		if (FALSE == $pageType) {
+			Yii::error("The page url is invalid, no page type: $originalPageUrl");
+			return null;
+		} elseif (strncmp($pageType, self::FIRST_PAGE_DIR, strlen(self::FIRST_PAGE_DIR)-1) == 0
+			|| strncmp($pageType, self::SECOND_PAGE_DIR, strlen(self::SECOND_PAGE_DIR)-1) == 0) {
+
+		} else {
+			Yii::error("The page url is invalid, page type($pageType) is wrong: $originalPageUrl");
+			return null;
+		}
+
+		Yii::info("pageUrl: $pageUrl => $originalPageUrl => $account => $weisiteId => $pageType");
+
+		$weisitePageDir = self::WEI_SITES_LOCAL_ROOT_DIR.$account."/".$weisiteId."/".$pageType."/";
+		
+		Yii::info("wei-site dir: $weisitePageDir");
+
+		return $weisitePageDir;
 	}
 
 	/**
@@ -341,7 +486,6 @@ class WeiSiteManager {
 	*/
 	public function get1stPagePath($account, $weiShortUrl) {
 		// 将短链接转换成原始链接
-		//$originalUrl = $this->convertUrlBySina(false, $weiShortUrl);
 		$originalUrl = UrlConverter::getInstance()->convertUrl(false, $weiShortUrl);
 		if (is_null($originalUrl)) {
 			Yii::error("Failed to convert the short url($weiShortUrl) to the original url");
@@ -401,7 +545,7 @@ class WeiSiteManager {
 	}
 
 	private function queryWeiSiteInfoByShortUrlSql($account, $shortUrl) {
-		$sql = "SELECT weiName, weiText from $this->WEI_SITE_DB where Account=:account And DestUrl=:shortUrl";
+		$sql = "SELECT WeiName, WeiText, OriginUrl from $this->WEI_SITE_DB where Account=:account And DestUrl=:shortUrl";
 		$params[':account'] = $account;
 		$params[':shortUrl'] = $shortUrl;
 
@@ -425,7 +569,7 @@ class WeiSiteManager {
 			return BizErrcode::ERR_FAILED;
 		}
 
-		return [$ret[0]['weiName'], $ret[0]['weiText']];
+		return [$ret[0]['WeiName'], $ret[0]['WeiText'], $ret[0]['OriginUrl']];
 	}
 
 
@@ -464,7 +608,7 @@ class WeiSiteManager {
 	 * @return 
 	*/
 	private function getAllWeiSitesSql($account) {
-		$sql = "SELECT WeiName, WeiPic, WeiText, DestUrl FROM $this->WEI_SITE_DB where Account=:account AND DeleteFlag='0'";
+		$sql = "SELECT WeiName, WeiPic, WeiText, DestUrl, OriginUrl FROM $this->WEI_SITE_DB where Account=:account AND DeleteFlag='0'";
 		$params[':account'] = $account;
 
 		return [$sql, $params];
@@ -493,7 +637,7 @@ class WeiSiteManager {
 	 * @param string $shortUrl 要删除的微网站所对应的首页短链接
 	 * @return 
 	*/
-	private function deletWeiSiteSql($account, $shortUrl) {
+	private function deleteWeiSiteSql($account, $shortUrl) {
 		$sql = "UPDATE $this->WEI_SITE_DB SET DeleteFlag='1' WHERE Account=:account AND DestUrl=:shortUrl";
 		$params[':account'] = $account;
 		$params[':shortUrl'] = $shortUrl;
@@ -504,7 +648,7 @@ class WeiSiteManager {
 	public function deleteWeiSite($account, $shortUrl) {
 		$db_handler = Yii::$app->db->getSvcDb();
 
-		list($sql, $params) = $this->deleteWeiSite($account, $shortUrl);
+		list($sql, $params) = $this->deleteWeiSiteSql($account, $shortUrl);
 		Yii::info("query sql: $sql");
 		$ret = $db_handler->execute($sql, $params);
 

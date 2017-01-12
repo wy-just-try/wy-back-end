@@ -21,6 +21,7 @@ class MiscDAO extends BaseModel {
 		$scenarios = parent::scenarios();
 		$scenarios['gen-pic-captcha'] = [];
 		$scenarios['gen-msg-captcha'] = ['cellPhone'];
+		$scenarios['upload-image'] = ['url'];
 
 		return $scenarios;
 	}
@@ -30,6 +31,7 @@ class MiscDAO extends BaseModel {
 	{
 		return [
 			[['cellPhone'],'required','on'=>'gen-msg-captcha'],
+			[['url'], 'required', 'on' => 'upload-image'],
 		];
 	}
 
@@ -37,7 +39,8 @@ class MiscDAO extends BaseModel {
 	public function attributes()
 	{
 		return [
-			'cellPhone'
+			'cellPhone',
+			'url',
 		];
 	}
 
@@ -50,6 +53,7 @@ class MiscDAO extends BaseModel {
 	{
 		return [
 			'cellPhone'	=>	'',
+			'url'		=>  '',
 		];
 	}
 
@@ -97,12 +101,20 @@ class MiscDAO extends BaseModel {
 	 * @param  [array] &$output 图片访问地址，如 [picUrl=>'xxx']
 	 * @return [int] 错误码
 	 */
-	public function uploadImg(&$output = [])
+	public function uploadImg($input, &$output = [])
 	{
+		$this->setScenario('upload-image');
+		$this->load($input, '');
+		$this->setDefaultVal();
+		if (!$this->validate()) {
+			Yii::error('The paramters of uploading image are wrong');
+			return BizErrcode::ERR_UPLOAD_FAILED;
+		}
+
 		$img = new UploadImg();
-		$ret = $img->upload($output);
+		$ret = $img->upload($input, $output);
 		if (BizErrcode::ERR_OK !== $ret) {
-			return BizErrcode::ERR_FAIL;
+			return BizErrcode::ERR_UPLOAD_FAILED;
 		}
 
 		return BizErrcode::ERR_OK;

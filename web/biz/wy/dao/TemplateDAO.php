@@ -144,7 +144,7 @@ class TemplateDAO extends BaseModel {
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
 			Yii::info('This account does not login');
-			//return BizErrcode::ERR_NOLOGIN;
+			return BizErrcode::ERR_NOLOGIN;
 		}
 
 		// 
@@ -169,16 +169,23 @@ class TemplateDAO extends BaseModel {
 			$account = "kfc";
 		}
 
+		$shortUrl = null;
 		$url = null;
 
 		if ($templateType == 1) {
-			$url = $this->create1stPage($account, $templateDirPath);
+			list($shortUrl, $url) = $this->create1stPage($account, $templateDirPath);
 			if (is_null($url)) {
 				Yii::error("Failed to create the first page of this weisite");
 				return BizErrcode::ERR_FAILED;
 			}
 		} else if ($templateType == 2) {
-			$url = $this->create2ndPage($account, $templateDirPath);
+			if (!in_array('url', $input)) {
+				Yii::warning("The passed first page url is NULL");
+				$firstPageUrl = null;
+			} else {
+				$firstPageUrl = $input['url'];
+			}
+			list($shortUrl, $url) = $this->create2ndPage($account, $firstPageUrl, $templateDirPath);
 			if (is_null($url)) {
 				Yii::error("Failed to create the sub page of this weisite");
 				return BizErrcode::ERR_FAILED;
@@ -188,7 +195,8 @@ class TemplateDAO extends BaseModel {
 			return BizErrcode::ERR_FAILED;
 		}
 
-		$output['destUrl'] = $url;
+		$output['destUrl'] = $shortUrl;
+		$output['originUrl'] = $url;
 
 		return BizErrcode::ERR_OK;
 	}
@@ -197,7 +205,7 @@ class TemplateDAO extends BaseModel {
 	 * 生成微网站首页
 	 * @param string $account 创建微网站的账户名
 	 * @param string $templateDirPath 创建微网站首页用到的模板文件夹在服务器上的绝对路径
-	 * @return 如果成功，则返回微网站首页的短链接；否则返回null
+	 * @return 如果成功，则返回微网站首页的短链接和原始链接；否则返回null
 	*/
 	private function create1stPage($account, $templateDirPath) {
 		// 创建微网站首页目录
@@ -245,7 +253,7 @@ class TemplateDAO extends BaseModel {
 			return null;
 		}
 
-		return $shortPageUrl;
+		return [$shortPageUrl, $pageUrl];
 	}
 
 	/**
@@ -253,12 +261,16 @@ class TemplateDAO extends BaseModel {
 	 * 所以必须保证:
 	 * 1. 二级页面的生成，必须先生成一级页而
 	 * 2. 当前用户最新的微网站目录下，已经创建首页，并且没有二组页面
+	 * @param string $account 创建子网页的用户名
+	 * @param string $firstPageUrl 创建子网页对应的首页的原始链接
+	 * @param string $templateDirPath 创建子网页用到的模板文件夹路径
+	 * @return 如果成功返回子网页的短链接和原始链接
 	*/
-	private function create2ndPage($account, $templateDirPath) {
+	private function create2ndPage($account, $firstPageUrl, $templateDirPath) {
 
 		// 创建微网站二级页面目录
 		$weiSiteMgr = WeiSiteManager::getInstance();
-		$pageDir = $weiSiteMgr->create2ndPageDir($account);
+		$pageDir = $weiSiteMgr->create2ndPageDir($account, $firstPageUrl);
 		if (is_null($pageDir)) {
 			Yii::error("Failed to create the 2nd page's directory of the account($account)'s weisite");
 			return null;
@@ -282,7 +294,13 @@ class TemplateDAO extends BaseModel {
 			return null;
 		}
 
-		return $pageUrl;
+		$shortPageUrl = $weiSiteMgr->createShortUrl($pageUrl);
+		if (is_null($shortPageUrl)) {
+			Yii::error("Failed to create the sub page's short url corresponding to the url($pageUrl)");
+			return null;
+		}
+
+		return [null, $pageUrl];
 	}
 
 	public function updateTemplate($input, &$output = []) {
@@ -296,7 +314,7 @@ class TemplateDAO extends BaseModel {
 		$loginBehavior = new LoginBehavior();
 		if ($loginBehavior->checkLogin() != BizErrcode::ERR_CHECKLOGIN_ALREADY_LOGIN) {
 			Yii::info('This account does not login');
-			//return BizErrcode::ERR_NOLOGIN;
+			return BizErrcode::ERR_NOLOGIN;
 		}
 
 		foreach ($input as $key => $value) {
@@ -372,9 +390,6 @@ class TemplateDAO extends BaseModel {
 
 </html>';
 
-	// http://wy626.com/weisites/kfc/weisite_3/1st/322915.html
-	private $testShortUrl = "http://t.cn/RI81Cee";
-
 	private function update1stPage($account, $input) {
 
 		// 在数据库中更新微网站信息
@@ -410,8 +425,10 @@ class TemplateDAO extends BaseModel {
 	private function handlePageContent($content) {
 		// 删除<!-- START editZonejs -->与<!-- END editZonejs -->之间的内容
 		$pattern = '/(<!-- START editZonejs -->)([\s\S]*)(<!-- END editZonejs -->)/';
+		Yii::info("Content: $content");
 		// 从后往前查找<!-- END editZone.js -->
-		$newContent = preg_replace($pattern, "", $this->testContent);
+		$newContent = preg_replace($pattern, "", $content);
+		Yii::info("newContent: $newContent");
 
 
 		// 从后往前查找<!-- START editZone.js -->
@@ -503,8 +520,8 @@ class TemplateDAO extends BaseModel {
 			$output['tempUrl'] = $url;
 		} else {
 			Yii::info("The first page's url($url) is passed in");
-			list($weiName, $weiDesc) = $weiSiteMgr->getWeiSiteInfoByShortUrl($account, $url);
-			$output['tempUrl'] = $url;
+			list($weiName, $weiDesc, $originUrl) = $weiSiteMgr->getWeiSiteInfoByShortUrl($account, $url);
+			$output['tempUrl'] = $originUrl;
 			$output['desc'] = $weiDesc;
 			$output['weiName'] = $weiName;
 		}

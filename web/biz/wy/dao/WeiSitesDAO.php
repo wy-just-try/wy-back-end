@@ -105,6 +105,7 @@ class WeiSitesDAO extends BaseModel {
 			$output[$i]['weiPic'] = $ret[$i]['WeiPic'];
 			$output[$i]['weiText'] = $ret[$i]['WeiText'];
 			$output[$i]['destUrl'] = $ret[$i]['DestUrl'];
+			$output[$i]['originUrl'] = $ret[$i]['OriginUrl'];
 		}
 
 		return BizErrcode::ERR_OK;

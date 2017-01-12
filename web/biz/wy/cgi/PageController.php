@@ -10,6 +10,9 @@ class PageController extends RenderController {
 
 	private function _actionGenPage() {
 		$input = $this->GPValue();
+		foreach ($input as $key => $value) {
+			Yii::info("input[$key]: $value");
+		}
 
 		$pageDao = new PageDAO();
 		$ret = $pageDao->generatePage($input, $output);
@@ -31,6 +34,9 @@ class PageController extends RenderController {
 
 	private function _actionUpdatePage() {
 		$input = $this->GPValue();
+		foreach ($input as $key => $value) {
+			Yii::info("input[$key]: $value");
+		}
 
 		$pageDao = new PageDAO();
 		$ret = $pageDao->updatePage($input, $output);
@@ -52,6 +58,9 @@ class PageController extends RenderController {
 
 	private function _actionGetPage() {
 		$input = $this->GPValue();
+		foreach ($input as $key => $value) {
+			Yii::info("input[$key]: $value");
+		}
 
 		$pageDao = new PageDAO();
 		$ret = $pageDao->getPage($input, $output);
@@ -73,6 +82,9 @@ class PageController extends RenderController {
 
 	private function _actionGetAllPages() {
 		$input = $this->GPValue();
+		foreach ($input as $key => $value) {
+			Yii::info("input[$key]: $value");
+		}
 
 		$pageDao = new PageDAO();
 		$ret = $pageDao->getAllPages($input, $output);
@@ -94,6 +106,9 @@ class PageController extends RenderController {
 
 	private function _actionDeletePage() {
 		$input = $this->GPValue();
+		foreach ($input as $key => $value) {
+			Yii::info("input[$key]: $value");
+		}
 
 		$pageDao = new PageDAO();
 		$ret = $pageDao->deletePage($input, $output);

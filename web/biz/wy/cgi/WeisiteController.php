@@ -34,6 +34,9 @@ class WeisiteController extends RenderController {
 
 	private function _actionDeleteWeiSite() {
 		$input = $this->GPValue();
+		foreach ($input as $key => $value) {
+			Yii::info("input[$key]: $value");
+		}
 
 		$weiSitesDao = new WeiSitesDAO();
 		$ret = $weiSitesDao->deleteWeiSite($input, $output);

@@ -3,6 +3,8 @@ namespace app\wy\ao;
 
 use Yii;
 use includes\BizErrcode;
+use app\wy\ao\WeiSiteManager;
+use app\wy\ao\UrlConverter;
 
 /**
 * 图片上传
@@ -27,18 +29,21 @@ class UploadImg
 		'image/x-png'
 	];
 
-	private function getUserDir()
+	private function getUserDir($url)
 	{
-		//coding by kfc
-		return '/home/luffy/myGithub/';
+		$weiSiteMgr = WeiSiteManager::getInstance();
+		$weisitePageDir = $weiSiteMgr->getWeiSitePageDirByUrl($url);
+
+		return $weisitePageDir;
 	}
 
 	/**
 	 * 上传图片逻辑
+	 * @param array $input 传入参数
 	 * @param  array  &$output 图片访问地址，如 [picUrl=>'xxx']
 	 * @return [int]          错误码
 	 */
-	public function upload(&$output = [])
+	public function upload($input, &$output = [])
 	{
 		if (!isset($_FILES['file'])) {
 			Yii::error('文件不存在');
@@ -67,7 +72,7 @@ class UploadImg
 			return BizErrcode::ERR_PARAM;
 		}
 
-		$dir = $this->getUserDir();
+		$dir = $this->getUserDir($input['url']);
 		$type = explode('/', $file['type'])[1];
 		
 		do {
@@ -79,7 +84,9 @@ class UploadImg
 			Yii::info('临时文件移动失败');
 		}
 
-		$output = ['picUrl' => '']; //coding by kfc
+		$picUrl = WeiSiteManager::getInstance()->createPageUrl($destFile);
+		Yii::info("Image url: $picUrl");
+		$output = ['picUrl' => $picUrl];
 		return BizErrcode::ERR_OK;
 	}
 

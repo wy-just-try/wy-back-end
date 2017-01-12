@@ -31,6 +31,9 @@ class MiscController extends RenderController {
 
 	private function _actionGenMsg() {
 		$input = $this->GPValue();
+		foreach ($input as $key => $value) {
+			Yii::info("input[$key]: $value");
+		}
 
 		$miscDAO = new MiscDAO();
 		$ret = $miscDAO->genMsgCaptcha($input, $output);
@@ -50,8 +53,13 @@ class MiscController extends RenderController {
 
 	private function _actionUploadImg()
 	{
+		$input = $this->GPValue();
+		foreach ($input as $key => $value) {
+			Yii::info("input[$key]: $value");
+		}
+
 		$miscDAO = new MiscDAO();
-		$ret = $miscDAO->uploadImg($output);
+		$ret = $miscDAO->uploadImg($input, $output);
 		if ($ret !== BizErrcode::ERR_OK) {
 			Yii::error('上传图片失败');
 			return $ret;
