@@ -32,20 +32,20 @@ class BaseController extends Controller
      */
     public function G2U($data)
     {
-        if(is_array($data) ||  is_object($data)){
-            foreach ($data as $key=>&$value){
-                if(is_array($value) || is_object($value)){
-                    $value = $this->G2U($value);
-                }
-                elseif(is_string($value)){
-                    $value = iconv('GBK', 'UTF-8//IGNORE', $value);
-                }else{
-                    continue;
-                }
-            }
-        }elseif(is_string($data)){
-            $data = iconv('GBK', 'UTF-8//IGNORE', $data);
-        }
+        // if(is_array($data) ||  is_object($data)){
+        //     foreach ($data as $key=>&$value){
+        //         if(is_array($value) || is_object($value)){
+        //             $value = $this->G2U($value);
+        //         }
+        //         elseif(is_string($value)){
+        //             $value = iconv('UTF-8', 'UTF-8//IGNORE', $value);
+        //         }else{
+        //             continue;
+        //         }
+        //     }
+        // }elseif(is_string($data)){
+        //     $data = iconv('GBK', 'UTF-8//IGNORE', $data);
+        // }
 
         return $data;
     }
@@ -55,17 +55,17 @@ class BaseController extends Controller
      */
     public function U2G($data)
     {
-        if(is_array($data) || is_object($data)) {
-            foreach ($data as &$value) {
-                if(is_array($value) || is_object($value)) {
-                    $value = $this->U2G($value);
-                } elseif(is_string($value)) {
-                    $value = iconv('UTF-8', 'GBK//IGNORE', $value);
-                }
-            }
-        } elseif(is_string($data)) {
-            $data = iconv('UTF-8', 'GBK//IGNORE', $data);
-        }
+        // if(is_array($data) || is_object($data)) {
+        //     foreach ($data as &$value) {
+        //         if(is_array($value) || is_object($value)) {
+        //             $value = $this->U2G($value);
+        //         } elseif(is_string($value)) {
+        //             $value = iconv('UTF-8', 'GBK//IGNORE', $value);
+        //         }
+        //     }
+        // } elseif(is_string($data)) {
+        //     $data = iconv('UTF-8', 'GBK//IGNORE', $data);
+        // }
 
         return $data;
     }
