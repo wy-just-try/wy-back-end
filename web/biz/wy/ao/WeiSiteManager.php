@@ -10,10 +10,11 @@ class WeiSiteManager {
 	private $WEI_SITE_DB = 'WeiNetInfo';
 
 	//const WEI_SITES_LOCAL_ROOT_DIR = '/Users/apple/software/project/workspace/wy/src/wy-back-end/web/weisites/';
-	const WEI_SITES_LOCAL_ROOT_DIR = '/data/back/web/weisites/';
+	const WEI_SITES_LOCAL_ROOT_DIR = '/data/data/back/web/weisites/';
 	const WEI_SITES_URL_ROOT_DIR = 'http://wy626.com/web/weisites/';
 	const FIRST_PAGE_DIR = '1st/';
 	const SECOND_PAGE_DIR = '2nd/';
+	const EDITABLE_PAGE_NAME = 'editable.shtml';
 
 
 	/**
@@ -287,7 +288,7 @@ class WeiSiteManager {
 
 		$weisiteDir = self::WEI_SITES_LOCAL_ROOT_DIR.$account."/".$weisiteId."/";
 
-		Yii::info("wei-site dir: $weiSiteDir");
+		Yii::info("wei-site dir: $weisiteDir");
 
 		return $weisiteDir;
 
@@ -536,6 +537,133 @@ class WeiSiteManager {
 		return $pagePath;
 	}
 
+	private function validatePagePath($pagePath) {
+		if (strncmp($pagePath, self::WEI_SITES_LOCAL_ROOT_DIR, strlen(self::WEI_SITES_LOCAL_ROOT_DIR)) != 0) {
+			Yii::error("Invalid page path: wrong prefix, $pagePath");
+			return FALSE;
+		}
+
+		$tempPagePath = substr($pagePath, strlen(self::WEI_SITES_LOCAL_ROOT_DIR));
+		$account = strstr($tempPagePath, "/", TRUE);
+		if (FALSE == $account) {
+			Yii::error("The page url is invalid, no account: $pagePath");
+			return FALSE;
+		}
+
+		$tempPagePath = substr($tempPagePath, strlen($account) + 1);
+		$weisiteId = strstr($tempPagePath, "/", TRUE);
+		if (FALSE == $weisiteId || strncmp($weisiteId, "weisite_", strlen("weisite_")) != 0) {
+			Yii::error("The page path is invalid, wei-site id is wrong: $pagePath");
+			return FALSE;
+		}
+
+		$tempPagePath = substr($tempPagePath, strlen($weisiteId) + 1);
+		$pageType = strstr($tempPagePath, "/", TRUE);
+		if (FALSE == $pageType) {
+			Yii::error("The page path is invalid, no page type: $pagePath");
+			return FALSE;
+		} elseif (strncmp($pageType, self::FIRST_PAGE_DIR, strlen(self::FIRST_PAGE_DIR)-1) == 0
+			|| strncmp($pageType, self::SECOND_PAGE_DIR, strlen(self::SECOND_PAGE_DIR)-1) == 0) {
+
+		} else {
+			Yii::error("The page path is invalid, page type($pageType) is wrong: $pagePath");
+			return FALSE;
+		}
+
+		$tempPagePath = substr($tempPagePath, strlen($pageType) + 1);
+		$slashToken = strpos($tempPagePath, "/");
+		if (FALSE != $slashToken) {
+			Yii::error("Invalid page path, wrong file name: $pagePath");
+			return FALSE;
+		}
+		$fileName = $tempPagePath;
+		if (!$this->is_html($fileName)) {
+			Yii::error("Invalid file name, it's not html: $pagePath");
+			return FALSE;
+		}
+
+		return [$account, $weisiteId, $pageType, $fileName];
+	}
+
+	/**
+	* 保存content到pagePath对应的可编辑html文件中
+	* @param string $pagePath 首页或子网页在服务器上的路径
+	* @param string $content 要保存的内容
+	* @return 如果成功返回可编辑网页的绝对路径；否则返回false
+	*/
+	public function saveContent($pagePath, $content) {
+		if (is_null($content) || strlen($content) == 0) {
+			Yii::error("Wrong content: length is 0");
+			return FALSE;
+		}
+		// 检查$pagePath是否合法
+		$ret = $this->validatePagePath($pagePath);
+		if (FALSE == $ret) {
+			Yii::error("Invalid page path: $pagePath");
+			return FALSE;
+		}
+		list($account, $weisiteId, $pageType, $fileName) = $ret;
+
+		// 生成网页所在的目录路径
+		$pageDir = self::WEI_SITES_LOCAL_ROOT_DIR.$account.'/'.$weisiteId.'/'.$pageType.'/';
+		if (!file_exists($pageDir) || !is_dir($pageDir)) {
+			Yii::error("Invalid page directory: not exist, $pageDir");
+			return FALSE;
+		}
+
+		// 
+		$pagePath = $pageDir.self::EDITABLE_PAGE_NAME;
+		Yii::info("The editable page path: $pagePath");
+
+		//打开文件
+		$handle = fopen($pagePath, "w+");
+		if (FALSE == $handle) {
+			Yii::error("Failed to open file($pagePath)");
+			return FALSE;
+		}
+
+		$ret = fwrite($handle, $content);
+		if (FALSE == $ret) {
+			Yii::error("Failed to write file($pagePath)");
+			if (FALSE == fclose($handle)) {
+				Yii::error("Failed to close file($pagePath)");
+				return FALSE;
+			}
+			return FALSE;
+		}
+
+		if (FALSE == fclose($handle)) {
+			Yii::error("Failed to close file($pagePath)");
+			return FALSE;
+		}
+
+		Yii::info("Success to save the editable page path: $pagePath");
+
+		return $pagePath;
+	}
+
+	public function getEditablePagePath($pagePath) {
+		// 检查$pagePath是否合法
+		$ret = $this->validatePagePath($pagePath);
+		if (FALSE == $ret) {
+			Yii::error("Invalid page path: $pagePath");
+			return FALSE;
+		}
+		list($account, $weisiteId, $pageType, $fileName) = $ret;
+
+		// 生成网页所在的目录路径
+		$pageDir = self::WEI_SITES_LOCAL_ROOT_DIR.$account.'/'.$weisiteId.'/'.$pageType.'/';
+		if (!file_exists($pageDir) || !is_dir($pageDir)) {
+			Yii::error("Invalid page directory: not exist, $pageDir");
+			return FALSE;
+		}
+
+		// 
+		$pagePath = $pageDir.self::EDITABLE_PAGE_NAME;
+		Yii::info("The editable page path: $pagePath");
+		return $pagePath;
+	}
+
 	public function isOriginalUrl($url) {
 		if (strncmp($url, self::WEI_SITES_URL_ROOT_DIR, strlen(self::WEI_SITES_URL_ROOT_DIR)) != 0) {
 			return false;
@@ -594,6 +722,11 @@ class WeiSiteManager {
 				}
 				if ($this->is_html($filename)) {
 					$pagePath = $destTemplate.$filename;
+
+					$editablePagePath = $destTemplate.self::EDITABLE_PAGE_NAME;
+					if (!copy($sourceTemplate."/".$filename, $editablePagePath)) {
+						Yii::error("Failed to copy $sourceTemplate/$filename to $editablePagePath");
+					}
 					Yii::info("Wei-site first page path: $pagePath");
 				}
 			}

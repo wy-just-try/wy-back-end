@@ -8,7 +8,7 @@ use app\wy\ao\UrlConverter;
 class PageManager {
 	
 	//const PAGE_LOCAL_ROOT_DIR = '/Users/apple/software/project/workspace/wy/src/wy-back-end/web/pages/';
-	const PAGE_LOCAL_ROOT_DIR = '/data/back/web/pages/';
+	const PAGE_LOCAL_ROOT_DIR = '/data/data/back/web/pages/';
 	const PAGE_URL_ROOT_DIR = 'http://wy626.com/web/pages/';
 	const PAGE_DIR_PREFIX = 'page_';
 	const PAGE_FILE_NAME = 'page.shtml';

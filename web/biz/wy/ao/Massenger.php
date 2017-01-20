@@ -33,8 +33,19 @@ class Massenger {
 	 * @return 如果发送成功则返回TRUE, 否则返回FALSE
 	*/
 	public function sendCaptcha($tel, $captcha) {
-		$content = sprintf($this->contentFormat, "短信验证码", $captcha, "2");
-		return $this->sendMessage($tel, "$content");
+		$res = FALSE;
+		$qcloudSms = QcloudSms::getInstance();
+		Yii::info("sendSms $tel, captcha: $captcha");
+		$params = array("验证码", $captcha, "2");
+		if (BizErrcode::ERR_MSG_OK != $qcloudSms->sendSmsWithParams($tel, QcloudSms::CAPTCHA_TEMPLATE_ID, $params, "", "", "")) {
+			Yii::error("Failed to send captcha: $tel, $captcha");
+			$res = FALSE;
+		} else {
+			Yii::info("Success to send captcha: $tel, $captcha");
+			$res = TRUE;
+		}
+
+		return $res;
 	}
 
 	/**
@@ -44,8 +55,22 @@ class Massenger {
 	 * @return 如果发送成功则返回TRUE, 否则返回FALSE
 	*/
 	public function sendNewPassword($tel, $password) {
-		$content = sprintf($this->contentFormat, "新密码", $password, "2");
-		return $this->sendMessage($tel, "$content");
+		//$content = sprintf($this->contentFormat, "新密码", $password, "2");
+		//return $this->sendMessage($tel, "$content");
+		$res = FALSE;
+		$qcloudSms = QcloudSms::getInstance();
+		Yii::info("sendSms $tel, new password: $password");
+		$params = array($password);
+		if (BizErrcode::ERR_MSG_OK != $qcloudSms->sendSmsWithParams(tel, QcloudSms::NEW_PASSWORD_TEMPLATE_ID, $params, "", "", "")) {
+			Yii::error("Failed to send new password: $tel, $password");
+			$res = FALSE;
+		} else {
+			Yii::info("Success to send new password: $tel, $password");
+			$res = TRUE;
+		}
+
+		return $res;
+
 	}
 
 	/**

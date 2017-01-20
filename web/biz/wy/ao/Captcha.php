@@ -124,7 +124,7 @@ class Captcha {
 
 			if (isset($_SESSION[self::MSG_CAPTCHA])) {
 				$realMsgCaptcha = $_SESSION[SELF::MSG_CAPTCHA];
-				if (strncasecmp($realMsgCaptch, $msgStr, self::MSG_CAPTCHA_LEN) == 0) {
+				if (strncasecmp($realMsgCaptcha, $msgStr, self::MSG_CAPTCHA_LEN) == 0) {
 				//if ($_SESSION[self::MSG_CAPTCHA] === $msgStr) {
 					// 清空session中的短信验证码
 					$_SESSION[self::MSG_CAPTCHA] = null;
@@ -140,7 +140,7 @@ class Captcha {
 			Yii::trace('The input message captcha is wrong');
 		}
 
-		return TRUE;
+		return FALSE;
 	}
 
 	private function sendMsgCaptcha($tel, $captcha) {

@@ -10,6 +10,9 @@ class QcloudSms {
     private $appid = 1400023181;
     private $appkey = "4e5fe20368da9e2478e5ac6728752d77";
     private $singleSender;
+
+    const CAPTCHA_TEMPLATE_ID = 8681;
+    const NEW_PASSWORD_TEMPLATE_ID = 9520;
     
     private static $instance;
 
@@ -28,6 +31,27 @@ class QcloudSms {
 
     public function __clone() {
     	trigger_error('Clone is not allowed!');
+    }
+
+    public function sendSmsWithParams($tel, $templateId, $params) {
+    	try {
+    		$result = $this->singleSender->sendWithParam("86", $tel, $templateId, $params, "", "", "");
+		    //var_dump($result);
+	    	$rsp = json_decode($result);
+	    	//var_dump($rsp);
+	    	if ($rsp->{'result'} == 0) {
+	    		Yii::info("Success to send message");
+	    		return BizErrcode::ERR_MSG_OK;
+	    	} else {
+	    		Yii::error("Response: $result");
+	    		return BizErrcode::ERR_MSG_FAILED;
+	    	}
+		}catch (\Exception $e) {
+		    Yii::error("Exception occurs in sendSms()");
+		    //var_dump($e);
+		    return BizErrcode::ERR_MSG_EXCEPTION;
+		}
+		
     }
 
   	// 普通单发

@@ -179,7 +179,7 @@ class TemplateDAO extends BaseModel {
 				return BizErrcode::ERR_FAILED;
 			}
 		} else if ($templateType == 2) {
-			if (!in_array('url', $input)) {
+			if (!array_key_exists('url', $input)) {
 				Yii::warning("The passed first page url is NULL");
 				$firstPageUrl = null;
 			} else {
@@ -406,6 +406,13 @@ class TemplateDAO extends BaseModel {
 			return BizErrcode::ERR_FAILED;
 		}
 
+		// 将原始的content保存起来
+		$ret = $weiSiteMgr->saveContent($pagePath, $input['content']);
+		if (FALSE == $ret) {
+			Yii::error("Failed to save the original content to $pagePath");
+			return BizErrcode::ERR_FAILED;
+		}
+
 		// 修改传递进来的网页内容
 		$content = $this->handlePageContent($input['content']);
 		if (is_null($content)) {
@@ -476,6 +483,13 @@ class TemplateDAO extends BaseModel {
 			return BizErrcode::ERR_FAILED;
 		}
 
+		// 将原始的content保存起来
+		$ret = $weiSiteMgr->saveContent($pagePath, $input['content']);
+		if (FALSE == $ret) {
+			Yii::error("Failed to save the original content to $pagePath");
+			return BizErrcode::ERR_FAILED;
+		}
+
 		// 修改传递进来的网页内容
 		$content = $this->handlePageContent($input['content']);
 		if (is_null($content)) {
@@ -517,15 +531,39 @@ class TemplateDAO extends BaseModel {
 		$weiSiteMgr = WeiSiteManager::getInstance();
 		if ($weiSiteMgr->isOriginalUrl($url)) {
 			Yii::info("The sub page url($url) is passed in");
-			$output['tempUrl'] = $url;
+			$pagePath = $weiSiteMgr->get2ndPagePath($account, $input['url']);
+			if (is_null($pagePath)) {
+				Yii::error("Failed to get the sub page's path of this weisite");
+				return BizErrcode::ERR_FAILED;
+			}
 		} else {
 			Yii::info("The first page's url($url) is passed in");
+			$pagePath = $weiSiteMgr->get1stPagePath($account, $input['url']);
+			if (is_null($pagePath)) {
+				Yii::error("Failed to get the first page's path of this weisite");
+				return BizErrcode::ERR_FAILED;
+			}
+		}
+
+		$editablePagePath = $weiSiteMgr->getEditablePagePath($pagePath);
+		if (FALSE == $editablePagePath) {
+			Yii::error("Cannot get editable page path: $pagePath");
+			return BizErrcode::ERR_FAILED;
+		}	
+
+		$editablePageUrl = $weiSiteMgr->createPageUrl($editablePagePath);
+		if (is_null($editablePageUrl)) {
+			Yii::error("Failed to create the editable page's url corresponding to the path($editablePagePath)");
+			return BizErrcode::ERR_FAILED;
+		}
+		$output['tempUrl'] = $editablePageUrl;
+		
+		if (!$weiSiteMgr->isOriginalUrl($url)) {
 			list($weiName, $weiDesc, $originUrl) = $weiSiteMgr->getWeiSiteInfoByShortUrl($account, $url);
-			$output['tempUrl'] = $originUrl;
+
 			$output['desc'] = $weiDesc;
 			$output['weiName'] = $weiName;
 		}
-
 		return BizErrcode::ERR_OK;
 	}
 }
