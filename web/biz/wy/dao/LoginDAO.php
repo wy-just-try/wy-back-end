@@ -322,7 +322,7 @@ class LoginDAO extends BaseModel
 	/**
 	 * 用来生成ascii(33 ~ 126)之间的随机字符串
 	 */
-	private function randStr($length = 16) {
+	private function randStr($length = 8) {
 		$str = "";
 		for ($i = 0; $i < $length; $i++) {
 			$str .= chr(mt_rand(33, 126));
