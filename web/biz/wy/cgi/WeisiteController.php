@@ -20,7 +20,7 @@ class WeisiteController extends RenderController {
 			Yii::error("Failed to get all wei-sites info");
 			return $ret;
 		}
-
+		
 		$this->retdata['data'] = $output;
 
 		return $ret;

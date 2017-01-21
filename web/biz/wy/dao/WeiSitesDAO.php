@@ -94,6 +94,7 @@ class WeiSitesDAO extends BaseModel {
 		$ret = $weiSiteMgr->getAllWeiSites($account);
 		if (is_array($ret) && count($ret) == 0) {
 			Yii::info("This account($account) doesnot create weisites");
+			$output = [];
 		} elseif (FALSE == $ret) {
 			Yii::error("Failed to get all of wei sites info of the $account");
 			return BizErrcode::ERR_FAILED;

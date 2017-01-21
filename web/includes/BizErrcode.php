@@ -81,6 +81,9 @@ class BizErrcode extends Errcode {
 	const ERR_UPLOAD_OK     = 0;
 	const ERR_UPLOAD_FAILED = 1;
 
+	// 生成微网站的返回状态(即生成模版页面)
+	const ERR_ENOUGH_WEISITES = 2; 		// 生成的微网站达到上限
+
 
 	public static $errMsg = [
 		'-5' => '免登录禁止写操作',

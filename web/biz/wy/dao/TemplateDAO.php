@@ -173,6 +173,11 @@ class TemplateDAO extends BaseModel {
 		$url = null;
 
 		if ($templateType == 1) {
+			$weiSiteMgr = WeiSiteManager::getInstance();
+			if ($weiSiteMgr->enoughWeisites($account)) {
+				Yii::info("Enough wei-sites. Cannot create the new wei-site");
+				return BizErrcode::ERR_ENOUGH_WEISITES;
+			}
 			list($shortUrl, $url) = $this->create1stPage($account, $templateDirPath);
 			if (is_null($url)) {
 				Yii::error("Failed to create the first page of this weisite");
@@ -185,7 +190,13 @@ class TemplateDAO extends BaseModel {
 			} else {
 				$firstPageUrl = $input['url'];
 			}
-			list($shortUrl, $url) = $this->create2ndPage($account, $firstPageUrl, $templateDirPath);
+			if (!array_key_exists('subUrl', $input)) {
+				Yii::warning("subUrl is not pass to me");
+				$subPageUrl = null;
+			} else {
+				$subPageUrl = $input['subUrl'];
+			}
+			list($shortUrl, $url) = $this->create2ndPage($account, $firstPageUrl, $subPageUrl, $templateDirPath);
 			if (is_null($url)) {
 				Yii::error("Failed to create the sub page of this weisite");
 				return BizErrcode::ERR_FAILED;
@@ -263,17 +274,26 @@ class TemplateDAO extends BaseModel {
 	 * 2. 当前用户最新的微网站目录下，已经创建首页，并且没有二组页面
 	 * @param string $account 创建子网页的用户名
 	 * @param string $firstPageUrl 创建子网页对应的首页的原始链接
+	 * @param string $subPageUrl 创建子网页的url，如果subPageUrl为空，表示要新建子网页；如果subPageUrl不为空，表示更新子网页
 	 * @param string $templateDirPath 创建子网页用到的模板文件夹路径
 	 * @return 如果成功返回子网页的短链接和原始链接
 	*/
-	private function create2ndPage($account, $firstPageUrl, $templateDirPath) {
+	private function create2ndPage($account, $firstPageUrl, $subPageUrl, $templateDirPath) {
 
 		// 创建微网站二级页面目录
 		$weiSiteMgr = WeiSiteManager::getInstance();
-		$pageDir = $weiSiteMgr->create2ndPageDir($account, $firstPageUrl);
-		if (is_null($pageDir)) {
-			Yii::error("Failed to create the 2nd page's directory of the account($account)'s weisite");
-			return null;
+		if (is_null($subPageUrl)) {
+			$pageDir = $weiSiteMgr->create2ndPageDir($account, $firstPageUrl);
+			if (is_null($pageDir)) {
+				Yii::error("Failed to create the 2nd page's directory of the account($account)'s weisite");
+				return null;
+			}
+		} else {
+			$pageDir = $weiSiteMgr->getWeiSitePageDirByUrl($subPageUrl);
+			if (is_null($pageDir)) {
+				Yii::error("Failed to get the 2nd page's directory of the account($account)'s weisite");
+				return null;
+			}
 		}
 
 		// copy模板到微网站首页目录中
@@ -406,15 +426,17 @@ class TemplateDAO extends BaseModel {
 			return BizErrcode::ERR_FAILED;
 		}
 
+		$content = rawurldecode($input['content']);
+
 		// 将原始的content保存起来
-		$ret = $weiSiteMgr->saveContent($pagePath, $input['content']);
+		$ret = $weiSiteMgr->saveContent($pagePath, $content);
 		if (FALSE == $ret) {
 			Yii::error("Failed to save the original content to $pagePath");
 			return BizErrcode::ERR_FAILED;
 		}
 
 		// 修改传递进来的网页内容
-		$content = $this->handlePageContent($input['content']);
+		$content = $this->handlePageContent($content);
 		if (is_null($content)) {
 			Yii::error("Failed to handle the first page's content");
 			return BizErrcode::ERR_FAILED;
@@ -429,13 +451,21 @@ class TemplateDAO extends BaseModel {
 		return BizErrcode::ERR_OK;
 	}
 
+	private function prevHandlepageContent($content) {
+		/** 删掉<head>中下面的两个script标签
+		* <script charset="utf-8" async="" src="//wy626.com/js/editZone.js?1"></script><script charset="utf-8" async="" src="//wy626.com/js/tools/jquery-3.1.1.min.js"></script</head>
+		*/
+		$pattern = '';
+	}
+
 	private function handlePageContent($content) {
 		// 删除<!-- START editZonejs -->与<!-- END editZonejs -->之间的内容
 		$pattern = '/(<!-- START editZonejs -->)([\s\S]*)(<!-- END editZonejs -->)/';
 		Yii::info("Content: $content");
-		// 从后往前查找<!-- END editZone.js -->
 		$newContent = preg_replace($pattern, "", $content);
 		Yii::info("newContent: $newContent");
+
+		// 从后往前查找<!-- END editZone.js -->
 
 
 		// 从后往前查找<!-- START editZone.js -->
@@ -483,15 +513,17 @@ class TemplateDAO extends BaseModel {
 			return BizErrcode::ERR_FAILED;
 		}
 
+		$content = rawurldecode($input['content']);
+
 		// 将原始的content保存起来
-		$ret = $weiSiteMgr->saveContent($pagePath, $input['content']);
+		$ret = $weiSiteMgr->saveContent($pagePath, $content);
 		if (FALSE == $ret) {
 			Yii::error("Failed to save the original content to $pagePath");
 			return BizErrcode::ERR_FAILED;
 		}
 
 		// 修改传递进来的网页内容
-		$content = $this->handlePageContent($input['content']);
+		$content = $this->handlePageContent($content);
 		if (is_null($content)) {
 			Yii::error("Failed to handle the sub page's content");
 			return BizErrcode::ERR_FAILED;
