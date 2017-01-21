@@ -61,7 +61,7 @@ class Massenger {
 		$qcloudSms = QcloudSms::getInstance();
 		Yii::info("sendSms $tel, new password: $password");
 		$params = array($password);
-		if (BizErrcode::ERR_MSG_OK != $qcloudSms->sendSmsWithParams(tel, QcloudSms::NEW_PASSWORD_TEMPLATE_ID, $params, "", "", "")) {
+		if (BizErrcode::ERR_MSG_OK != $qcloudSms->sendSmsWithParams($tel, QcloudSms::NEW_PASSWORD_TEMPLATE_ID, $params, "", "", "")) {
 			Yii::error("Failed to send new password: $tel, $password");
 			$res = FALSE;
 		} else {
@@ -70,7 +70,6 @@ class Massenger {
 		}
 
 		return $res;
-
 	}
 
 	/**
