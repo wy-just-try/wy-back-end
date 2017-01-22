@@ -302,11 +302,6 @@ class TemplateDAO extends BaseModel {
 			Yii::error("Failed to copy the directory from $templatePath to $pageDir");
 			return null;
 		}
-		//if (!copy($templteDirPath, $pageDir.basename($templteDirPath))){
-		//	Yii::error("复制$templatePath到$pageDir目录失败");
-		//	return null;
-		//}
-
 		// 生成微网站首页的访问链接
 		$pageUrl = $weiSiteMgr->createPageUrl($pagePath);
 		if (is_null($pageUrl)) {
@@ -428,6 +423,8 @@ class TemplateDAO extends BaseModel {
 
 		$content = rawurldecode($input['content']);
 
+		$content = $this->preHandlePageContent($content);
+
 		// 将原始的content保存起来
 		$ret = $weiSiteMgr->saveContent($pagePath, $content);
 		if (FALSE == $ret) {
@@ -451,11 +448,29 @@ class TemplateDAO extends BaseModel {
 		return BizErrcode::ERR_OK;
 	}
 
-	private function prevHandlepageContent($content) {
-		/** 删掉<head>中下面的两个script标签
-		* <script charset="utf-8" async="" src="//wy626.com/js/editZone.js?1"></script><script charset="utf-8" async="" src="//wy626.com/js/tools/jquery-3.1.1.min.js"></script</head>
+	private function preHandlePageContent($content) {
+		$newContent = $content;
+
+		/** 删掉<head>里面的script标签
+		* <script charset="utf-8" async="" src="//wy626.com/js/editZone.js?1"></script>
 		*/
-		$pattern = '';
+		$pattern = '/<script\s{1,}charset="utf-8"\s{1,}async=""\s{1,}src="\/\/wy626\.com\/js\/editZone\.js\?\d{1,}"><\/script>/';
+		$newContent = preg_replace($pattern, "", $newContent);
+
+		/** 删掉<head>里面的script标签
+		* <script charset="utf-8" async="" src="//wy626.com/js/tools/jquery-3.1.1.min.js"></script>
+		*/
+		$pattern = '/<script\s{1,}charset="utf-8"\s{1,}async=""\s{1,}src="\/\/wy626.com\/js\/tools\/jquery-\d{1}\.\d{1}\.\d{1}\.min\.js"><\/script>/';
+		$newContent = preg_replace($pattern, "", $newContent);
+		
+		/**
+		* 删除wy-active, 已在前端完成
+		*/
+		// $pattern = '/wy-active/';
+		// $newContent = preg_replace($pattern, "", $content);
+		// Yii::info("removed wy-active: $newContent");
+
+		return $newContent;
 	}
 
 	private function handlePageContent($content) {
@@ -514,6 +529,8 @@ class TemplateDAO extends BaseModel {
 		}
 
 		$content = rawurldecode($input['content']);
+
+		$content = $this->preHandlePageContent($content);
 
 		// 将原始的content保存起来
 		$ret = $weiSiteMgr->saveContent($pagePath, $content);
