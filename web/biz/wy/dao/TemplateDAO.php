@@ -161,7 +161,6 @@ class TemplateDAO extends BaseModel {
 
 		Yii::info("template path: $templateDirPath");
 
-		// 创建此用户的微网站目录
 		// 获取用户名
 		if (isset($_SESSION[$loginBehavior::sessName()])) {
 			$account = $_SESSION[$loginBehavior->loginAccout()];
@@ -173,23 +172,29 @@ class TemplateDAO extends BaseModel {
 		$url = null;
 
 		if ($templateType == 1) {
+			// 检查当前用户创建的微网站个数是否已经达到上限，只在生成首页的时候才被调用
 			$weiSiteMgr = WeiSiteManager::getInstance();
 			if ($weiSiteMgr->enoughWeisites($account)) {
 				Yii::info("Enough wei-sites. Cannot create the new wei-site");
 				return BizErrcode::ERR_ENOUGH_WEISITES;
 			}
+			// 生成首页
 			list($shortUrl, $url) = $this->create1stPage($account, $templateDirPath);
 			if (is_null($url)) {
 				Yii::error("Failed to create the first page of this weisite");
 				return BizErrcode::ERR_FAILED;
 			}
 		} else if ($templateType == 2) {
+			// 检查首页的url是否传入，用首页的url来获取当前微网站的目录路径
 			if (!array_key_exists('url', $input)) {
 				Yii::warning("The passed first page url is NULL");
 				$firstPageUrl = null;
 			} else {
 				$firstPageUrl = $input['url'];
 			}
+			// 检查子网页的url是否传入，
+			// 如果传入的值不为null，表示重新生成这个子网页，即之前生成的子网页要被删除
+			// 如果传入的值为null，表示此子网页是第一次生成
 			if (!array_key_exists('subUrl', $input)) {
 				Yii::warning("subUrl is not pass to me");
 				$subPageUrl = null;
@@ -227,14 +232,7 @@ class TemplateDAO extends BaseModel {
 			return null;
 		}
 
-		// to-do
-		// 这里的$templateDirPath应该是模板目录
-		// copy是将这个目录下的html和css文件复制到此用户的微网站目录中
-		// copy模板到微网站首页目录中
-		//if (!copy($templateDirPath, $pageDir.basename($templateDirPath))){
-		//	Yii::error("复制$templatePath到$pageDir目录失败");
-		//	return null;
-		//}
+		// 将首页用到的模板文件都copy到首页的目录中
 		$pagePath = $weiSiteMgr->copyTemplate($templateDirPath, $pageDir);
 		if (is_null($pagePath)) {
 			Yii::error("Failed to copy the directory from $templatePath to $pageDir");
@@ -258,7 +256,7 @@ class TemplateDAO extends BaseModel {
 
 		// to-do，这里传入的$templatePath应该是首页html文件的路径
 		// 将微网站信息插入到数据库中
-		$ret = $weiSiteMgr->insertWeiSite($account, $pagePath, $pageUrl, $shortPageUrl);
+		$ret = $weiSiteMgr->insertWeiSite($account, $pagePath, '微网站', $pageUrl, $shortPageUrl);
 		if (FALSE == $ret) {
 			Yii::error("Failed to insert this weisite to database");
 			return null;
@@ -296,19 +294,19 @@ class TemplateDAO extends BaseModel {
 			}
 		}
 
-		// copy模板到微网站首页目录中
+		// copy模板到微网站二级页面的目录中
 		$pagePath = $weiSiteMgr->copyTemplate($templateDirPath, $pageDir);
 		if (is_null($pagePath)) {
 			Yii::error("Failed to copy the directory from $templatePath to $pageDir");
 			return null;
 		}
-		// 生成微网站首页的访问链接
+		// 生成微网站二级页面的访问链接
 		$pageUrl = $weiSiteMgr->createPageUrl($pagePath);
 		if (is_null($pageUrl)) {
 			Yii::error("Failed to create the sub page's url corresponding to the path($pagePath)");
 			return null;
 		}
-
+		// 生成短链接
 		$shortPageUrl = $weiSiteMgr->createShortUrl($pageUrl);
 		if (is_null($shortPageUrl)) {
 			Yii::error("Failed to create the sub page's short url corresponding to the url($pageUrl)");
@@ -360,51 +358,6 @@ class TemplateDAO extends BaseModel {
 		return $ret;
 	}
 
-	private $testContent = '<!DOCTYPE html>
-<html>
-
-<head>
-	<!--#include virtual="/page/publicTemplate.shtml" -->
-    <link href="//wy626.com/template/mod01/mod01.css" rel="stylesheet" type="text/css">
-</head>
-
-<body>
-    <div id="wrap" class="wy-edit wy-edit-img"></div>
-    <div class="modbgd">
-        <a href="javascript:;" class="wy-edit wy-edit-link">
-            <div class="menu clr wy-edit-title">
-                <img src="//wy626.com/template/mod01/arrow.png">菜单1
-            </div>
-        </a>
-        <a href="javascript:;" class="wy-edit wy-edit-link">
-            <div class="menu clr wy-edit-title">
-                <img src="//wy626.com/template/mod01/arrow.png">菜单2
-            </div>
-        </a>
-        <a href="javascript:;" class="wy-edit wy-edit-link">
-            <div class="menu clr wy-edit-title">
-                <img src="//wy626.com/template/mod01/arrow.png">菜单3
-            </div>
-        </a>
-        <a href="javascript:;" class="wy-edit wy-edit-link">
-            <div class="menu clr wy-edit-title">
-                <img src="//wy626.com/template/mod01/arrow.png">菜单4
-            </div>
-        </a>
-        <a href="javascript:;" class="wy-edit wy-edit-link">
-            <div class="menu clr wy-edit-title">
-                <img src="//wy626.com/template/mod01/arrow.png">菜单5
-            </div>
-        </a>
-    </div>
-
-    <!-- START editZonejs -->
-    <!--#include virtual="/js/ssi/editZoneEntra.shtml" -->
-    <!-- END editZonejs -->
-</body>
-
-</html>';
-
 	private function update1stPage($account, $input) {
 
 		// 在数据库中更新微网站信息
@@ -421,8 +374,10 @@ class TemplateDAO extends BaseModel {
 			return BizErrcode::ERR_FAILED;
 		}
 
+		// 
 		$content = rawurldecode($input['content']);
 
+		// 处理过后的content，会被保存到用户访问的网页和编辑使用的网页中
 		$content = $this->preHandlePageContent($content);
 
 		// 将原始的content保存起来
@@ -479,11 +434,6 @@ class TemplateDAO extends BaseModel {
 		Yii::info("Content: $content");
 		$newContent = preg_replace($pattern, "", $content);
 		Yii::info("newContent: $newContent");
-
-		// 从后往前查找<!-- END editZone.js -->
-
-
-		// 从后往前查找<!-- START editZone.js -->
 
 
 		// 删除所有class中的wy-edit开始的类

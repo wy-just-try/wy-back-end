@@ -667,21 +667,22 @@ class WeiSiteManager {
 	/**
 	 * 将微网站添加到数据库中
 	*/
-	public function insertWeiSite($account, $templateId, $pageUrl, $shortPageUrl) {
+	public function insertWeiSite($account, $templateId, $weiTitle, $pageUrl, $shortPageUrl) {
 
 		$db_handler = Yii::$app->db->getSvcDb();
-		list($sql, $params) = $this->insertWeiSiteSql($account, $templateId, $pageUrl, $shortPageUrl);
+		list($sql, $params) = $this->insertWeiSiteSql($account, $templateId, $weiTitle, $pageUrl, $shortPageUrl);
 
 		Yii::info("sql: $sql");
 		$ret = $db_handler->insert($sql, $params);
 		return $ret;
 	}
 
-	private function insertWeiSiteSql($account, $templateId, $pageUrl, $shortPageUrl) {
+	private function insertWeiSiteSql($account, $templateId, $weiTitle, $pageUrl, $shortPageUrl) {
 		$now = date('Y-m-d H-i-s');
-		$sql = "insert into {$this->WEI_SITE_DB} (Account,FileName,OriginUrl,DestUrl,InsertTime,ModifyTime) values(:account,:filename, :pageUrl,:shortPageUrl,'{$now}','{$now}')";
+		$sql = "insert into {$this->WEI_SITE_DB} (Account,FileName, WeiName, OriginUrl,DestUrl,InsertTime,ModifyTime) values(:account,:filename, :weiTitle, :pageUrl,:shortPageUrl,'{$now}','{$now}')";
 		$params[':account'] = $account;
 		$params[':filename'] = $templateId;
+		$params[':weiTitle'] = $weiTitle;
 		$params[':pageUrl'] = $pageUrl;
 		$params[':shortPageUrl'] = $shortPageUrl;
 

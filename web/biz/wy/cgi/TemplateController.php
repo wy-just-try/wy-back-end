@@ -117,28 +117,4 @@ class TemplateController extends RenderController {
 
 		return $this->renderJson($ret, $this->retdata);
 	}
-
-	private function testQcloud() {
-
-		$config = array('SecretId'       => 'AKIDIzpZFhyJMCqIYcKEpJcmsmU4SdfXJbWG',
-		                'SecretKey'      => '31xkwztcsyyY0GKCvSs68mBVdZWIsFSo',
-		                'RequestMethod'  => 'GET',
-		                'DefaultRegion'  => 'gz');
-
-		$cvm = QcloudApi::load(QcloudApi::MODULE_CVM, $config);
-
-		$package = array('offset' => 0, 'limit' => 3);
-
-		//$a = $cvm->DescribeInstances($package);
-		 $a = $cvm->generateUrl('DescribeInstances', $package);
-
-		if ($a === false) {
-		    $error = $cvm->getError();
-		    echo "Error code:" . $error->getCode() . ".\n";
-		    echo "message:" . $error->getMessage() . ".\n";
-		    echo "ext:" . var_export($error->getExt(), true) . ".\n";
-		} 
-		
-		return $this->renderJson(0, $a);
-	}
 }
