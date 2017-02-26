@@ -90,20 +90,20 @@ class ManageController extends BaseController
         $httpParams = $this->GPValue();
         $Id = intval($httpParams['Id']);
         $MaxNum = intval($httpParams['MaxNum']);
-        if($Id <= 0 || $MaxNum <= 0)
+        if($MaxNum <= 0)
         {
-            Yii::error("invalid params,id:".$Id.";maxnum:".$MaxNum);
+            Yii::error("invalid params,;maxnum:".$MaxNum);
             return $this->renderJson(C1001ErrCode::INVALID_PARAMS,[]);
         }
-
+        //$Id = 0;
         $iRet = CAoImage::UpdateMaxNum($Id,$MaxNum);
         if($iRet != 0)
         {
-            Yii::error("delete ao fail,iret:".$iRet);
+            Yii::error("update ao fail,iret:".$iRet);
             return $this->renderJson($iRet,[]);
         }
 
-        Yii::info("delete success,id:".$Id);
+        Yii::info("update click num success");
         return $this->renderJson(0,[]);
     }
 

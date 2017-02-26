@@ -196,12 +196,14 @@ class CC1001ImageInfoDao extends BaseModel
         $this->setDefaultVal();
         $this->load($Req, "");
 
-        if($this->Id <= 0)
+        if($this->DelFlag > 0)
         {
-            Yii::error("id is err,id:".$this->Id);
-            return C1001ErrCode::INVALID_PARAMS;
+            if($this->Id <= 0)
+            {
+                Yii::error("id is err,id:".$this->Id);
+                return C1001ErrCode::INVALID_PARAMS;
+            }
         }
-
         $sql = "update ".$this->tablename;
         list($params,$where) = $this->_BuildUpdateSql();
         $sql.=$where;

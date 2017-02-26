@@ -1,5 +1,8 @@
 <?php
 // comment out the following two lines when deployed to production
+
+error_reporting(E_ALL & ~E_NOTICE&~E_WARNING&~E_ERROR);
+
 defined('YII_DEBUG') or define('YII_DEBUG', true);
 defined('YII_ENV') or define('YII_ENV', 'prod');
 

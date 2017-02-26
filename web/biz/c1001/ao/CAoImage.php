@@ -164,7 +164,7 @@ class CAoImage
     }
     public static function UpdateMaxNum($Id,$MaxNum)
     {
-        if($Id <= 0 || $MaxNum <= 0)
+        if($MaxNum <= 0)
         {
             Yii::error("invalid params,id:".$Id.";maxnum:".$MaxNum);
            return C1001ErrCode::INVALID_PARAMS;
