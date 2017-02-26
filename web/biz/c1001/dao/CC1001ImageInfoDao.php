@@ -7,6 +7,7 @@
  */
 namespace app\c1001\dao;
 
+use app\c1001\common\C1001Const;
 use component\model\BaseModel;
 use yii;
 use app\c1001\common\C1001ErrCode;
@@ -79,7 +80,7 @@ class CC1001ImageInfoDao extends BaseModel
         $db_handler = Yii::$app->db->getSvcDb();
         $iRet = 0;
         $iRet = $db_handler->execute($sql, $params);
-        if(false == $iRet)
+        if(false === $iRet)
         {
             Yii::error("update click fail");
             return -2;
@@ -94,16 +95,23 @@ class CC1001ImageInfoDao extends BaseModel
         //查询存在扫描次数小于最大的，且上传时间最小的，未删除图片
         $params[':1'] = 0;
         $params[':2'] = intval($oReq['ImageType']);
+        if($oReq['ImageType'] == C1001Const::IMAGE_USE_TYPE_CROWD)
+        {
+            $sql = "select Id,Url,ImageType,ImageName from ".$this->tablename." where ClickNum < MaxNum and DelFlag = :1 and ImageType = :2 order by InsertTime asc limit 1";
+        }
+        else{
+            $sql = "select Id,Url,ImageType,ImageName  from ".$this->tablename." where  DelFlag = :1 and ImageType = :2 order by InsertTime asc limit 1";
+        }
 
-        $sql = "select Id,Url,ImageType from ".$this->tablename." where ClickNum < MaxNum and DelFlag = :1 and ImageType = :2 order by InsertTime asc limit 1";
+        //$sql = "select Id,Url,ImageType from ".$this->tablename." where ClickNum < MaxNum and DelFlag = :1 and ImageType = :2 order by InsertTime asc limit 1";
 
         Yii::info("update sql : [".$this->getSqlInfo($sql, $params)."]".";param:".var_export($params,true));
 
         $db_handler = Yii::$app->db->getSvcDb();
         $Resp = $db_handler->getOne($sql,$params);
-        if($Resp == false)
+        if($Resp === false)
         {
-            Yii::error("query image fail");
+            Yii::error("query image fail,ret:".var_export($Resp,true));
             return C1001ErrCode::DB_FAIL;
         }
 
@@ -126,7 +134,7 @@ class CC1001ImageInfoDao extends BaseModel
 
         $db_handler = Yii::$app->db->getSvcDb();
         $Resp = $db_handler->insert($sql,$params);
-        if($Resp == false)
+        if($Resp === false)
         {
             Yii::error("insert fail");
             return C1001ErrCode::DB_FAIL;
@@ -147,6 +155,36 @@ class CC1001ImageInfoDao extends BaseModel
 
         $sql.=" )";
     }
+    public function GetTotal($Req)
+    {
+        $this->setDefaultVal();
+        $this->load($Req, "");
+
+        $sql = "select count(1) total from ".$this->tablename." where DelFlag = :DelFlag and ClickNum < MaxNum and ImageType = :ImageType ";
+        $params[':DelFlag'] = 0;
+        $params[':ImageType'] = C1001Const::IMAGE_USE_TYPE_CROWD;
+
+        //list($limit,$param_limit) = $this->_BuildLimit();
+
+       // $params = array_merge($params,$param_limit);
+       // $sql .=$limit;
+
+        Yii::info("select sql : [".$this->getSqlInfo($sql, $params)."]".";param:".var_export($params,true));
+
+        $db_handler = Yii::$app->db->getSvcDb();
+        $Ret = $db_handler->getOne($sql,$params);
+        if($Ret === false)
+        {
+            Yii::error("query total fail,ret:".var_export($Ret,true));
+            return C1001ErrCode::DB_FAIL;
+        }
+
+        Yii::info("query total success,ret:".var_export($Ret,true));
+        return $Ret['total'];
+    }
+
+
+
 
     public function QueryList($Req,&$vResp)
     {
@@ -154,8 +192,9 @@ class CC1001ImageInfoDao extends BaseModel
         $this->setDefaultVal();
         $this->load($Req, "");
 
-        $sql = "select ".implode(",", $this->attributes())." from ".$this->tablename." where DelFlag = :DelFlag ";
+        $sql = "select ".implode(",", $this->attributes())." from ".$this->tablename." where DelFlag = :DelFlag and ImageType = :ImageType and ClickNum < MaxNum order by InsertTime asc ";
         $params[':DelFlag'] = 0;
+        $params[':ImageType'] = C1001Const::IMAGE_USE_TYPE_CROWD;
 
         list($limit,$param_limit) = $this->_BuildLimit();
 
@@ -166,9 +205,9 @@ class CC1001ImageInfoDao extends BaseModel
 
         $db_handler = Yii::$app->db->getSvcDb();
         $vResp = $db_handler->getAll($sql,$params);
-        if($vResp == false)
+        if($vResp === false)
         {
-            Yii::error("query image fail");
+            Yii::error("query image fail,ret:".var_export($vResp,true));
             return C1001ErrCode::DB_FAIL;
         }
 

@@ -7,6 +7,7 @@
  */
 
 namespace app\c1001\ao;
+use app\c1001\common\C1001Const;
 use app\c1001\dao\CC1001ImageInfoDao;
 use yii;
 
@@ -16,12 +17,23 @@ class CAoClient
    {
        $oImageDao = new CC1001ImageInfoDao();
        $iRet = $oImageDao->QueryValidImageInfo($oReq,$oResp);
-       if($iRet != 0)
+       if($iRet === 0)
        {
-           Yii::error("ao QueryValidImageInfo fail,iRet:".$iRet);
+           Yii::error("ao QueryValidImageInfo success");
            return $iRet;
        }
 
+       if($oReq['ImageType'] == C1001Const::IMAGE_USE_TYPE_CROWD && empty($oResp))
+       {
+           $oReq['ImageType'] = C1001Const::IMAGE_USE_TYPE_GZ;
+           $iRet = $oImageDao->QueryValidImageInfo($oReq,$oResp);
+           if($iRet != 0)
+           {
+               Yii::error("ao QueryValidImageInfo fail,iRet:".$iRet);
+               return $iRet;
+           }
+           $oResp['ImageType'] = C1001Const::IMAGE_USE_TYPE_GZ;
+       }
        Yii::info("ao QueryValidImageInfo success");
        return 0;
    }

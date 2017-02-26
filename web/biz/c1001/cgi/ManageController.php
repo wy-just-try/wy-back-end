@@ -42,6 +42,7 @@ class ManageController extends BaseController
         $PageSize = intval($httpParams['PageSize']);
 
         $this->retdata['data'] = [];
+        $this->retdata['total'] = 0;
         if($PageIndex < 0 || $PageSize <= 0)
         {
             Yii::error("invalid param,pageindex:".$PageIndex.";pagesize:".$PageSize);
@@ -52,7 +53,7 @@ class ManageController extends BaseController
         $Req['PageIndex'] = $PageIndex;
         $Req['PageSize'] = $PageSize;
 
-        $iRet = CAoImage::GetList($Req,$this->retdata['data']);
+        $iRet = CAoImage::GetList($Req,$this->retdata);
         if($iRet != 0)
         {
             Yii::error("get list fail,iret:".$iRet);

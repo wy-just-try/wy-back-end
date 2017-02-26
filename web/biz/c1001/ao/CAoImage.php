@@ -9,11 +9,9 @@ use app\c1001\dao\CC1001ImageInfoDao;
 
 class CAoImage
 {
+    
    public static function Upload($FileInfo,$httpParams)
    {
-       $httpParams['ImageType'] = time() % 2 +1;
-       $httpParams['MaxNum'] = 10;
-
         //检验用户输入信息
        $iRet =CAoImage::CheckImageInput($httpParams);
        if($iRet != 0)
@@ -21,8 +19,6 @@ class CAoImage
            Yii::error("check image input fail,iret:".$iRet);
            return $iRet;
        }
-
-
        $ImagetName = time()."_".$FileInfo['imagefile']['name'];
        $FileInfo['imagefile']['name'] = $ImagetName;
 
@@ -57,6 +53,28 @@ class CAoImage
            return $iRet;
        }
 
+       //若是公众号图片，则删除数据库中原来的
+       if($httpParams['ImageType'] == C1001Const::IMAGE_USE_TYPE_GZ)
+       {
+           $Ret = $oImageDao->QueryValidImageInfo($httpParams,$OldInfo);
+           if($Ret != 0)
+           {
+               Yii::error("QueryValidImageInfo fail,iret:".$Ret);
+               return $Ret;
+           }
+
+           if($OldInfo['Id'] <= 0 || empty($OldInfo['ImageName'] ))
+           {
+               return 0;
+           }
+
+           $Ret = self::Delete($OldInfo['Id'],$OldInfo['ImageName']);
+           if($Ret != 0)
+           {
+               Yii::error("delete fail,iret:".$Ret);
+               return $Ret;
+           }
+       }
        return 0;
     }
 
@@ -126,7 +144,16 @@ class CAoImage
     public static function GetList($Req,&$vResp)
     {
         $oImageDao = new CC1001ImageInfoDao();
-        $iRet = $oImageDao->QueryList($Req,$vResp);
+        $total = 0;
+        $total = $oImageDao->GetTotal($Req);
+        if($total <= 0)
+        {
+            Yii::error("query fail or data is empty");
+            return $total;
+        }
+        $vResp['total'] = $total;
+
+        $iRet = $oImageDao->QueryList($Req,$vResp['data']);
         if($iRet != 0)
         {
             Yii::error("query list fail,iret:".$iRet);
