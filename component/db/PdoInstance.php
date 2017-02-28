@@ -77,12 +77,34 @@ class PdoInstance extends Object
 	 */
 	public function getSvcDb()
 	{
+		/*
 		$mines = BizConst::DB_MINES;
 		$host = BizConst::DB_HOST;
 		$dbname = BizConst::DB_DATABASE;
-		$charset = BizConst::DB_CHARSET;
+		$charset = BizConst::DB_CHARSET;*/
+
+		if(defined("DB_DEV") === true)
+		{
+			//Yii::info("dev,dbinfo:".var_export( BizConst::$Dev_Db,true));
+			$mines = BizConst::$Dev_Db['mines'];
+			$host = BizConst::$Dev_Db['host'];
+			$dbname = BizConst::$Dev_Db['dbname'];
+			$charset = BizConst::$Dev_Db['charset'];
+			$user = BizConst::$Dev_Db['user'];
+			$password = BizConst::$Dev_Db['password'];
+		}
+		else{
+			//Yii::info("idc,dbinfo:".var_export( BizConst::$Idc_Db,true));
+			$mines = BizConst::$Idc_Db['mines'];
+			$host = BizConst::$Idc_Db['host'];
+			$dbname = BizConst::$Idc_Db['dbname'];
+			$charset = BizConst::$Idc_Db['charset'];
+			$user = BizConst::$Idc_Db['user'];
+			$password = BizConst::$Idc_Db['password'];
+		}
+
 		$dsn = "$mines:host=$host;dbname=$dbname;charset=$charset";
-		return $this->getDb($dsn, BizConst::DB_USER, BizConst::DB_PASSWD);
+		return $this->getDb($dsn, $user, $password);
 	}
 
 	/**

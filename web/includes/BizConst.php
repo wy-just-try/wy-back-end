@@ -15,6 +15,28 @@ class BizConst
 	const DB_USER = 'root'; // 用户名称
 	const DB_PASSWD = '000000'; // 连接密码
 	const DB_CHARSET = 'utf8';	// 连接数据库字符编码
+
+	//线上数据库
+	public static $Idc_Db =[
+		'mines' => 'mysql',
+		'host' => '127.0.0.1',
+		'dbname' => 'mpWeixin',
+		'user' => 'root',
+		'password' => '000000',
+		'charset' => 'utf8',
+	];
+	public static $Dev_Db =[
+		'mines' => 'mysql',
+		'host' => '127.0.0.1',
+		'dbname' => 'devData',
+		'user' => 'mydev',
+		'password' => 'dev@wy',
+		'charset' => 'utf8',
+	];
+
+
+
+
 }
 
 
