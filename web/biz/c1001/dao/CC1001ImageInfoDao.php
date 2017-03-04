@@ -283,6 +283,10 @@ class CC1001ImageInfoDao extends BaseModel
             $params[':Id'] = $this->Id;
             $sql.=" and Id = :Id";
         }
+        if($this->MaxNum > 0)
+        {
+            $sql .= " and ClickNum < MaxNum ";
+        }
 
         return [$params,$sql];
     }

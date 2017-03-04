@@ -12,7 +12,9 @@ namespace app\c1001\common;
 
 class C1001Const
 {
-     const IMAGE_SERVER_PATH = "/data/front/static/c1001/";//图片在服务器上的路经
+     const IMAGE_SERVER_PATH = "/data/front/static/c1001/";//idc图片在服务器上的路经
+     const IMAGE_SERVER_PATH_DEV = "/export/dev/front/static/c1001/";//dev图片在服务器上的路经
+
      const IMAGE_URL_PREFIX="http://wy626.com/c1001/";//图片域名前缀
      public  static $imageType = ["image/jpg","image/png","image/gif","image/jpeg","image/tif","image/bmp"];//支持上传图片的类型
 
@@ -20,5 +22,17 @@ class C1001Const
     const IMAGE_USE_TYPE_GZ = 2; //公众号二维码图
 
     public static $imageUserType =[C1001Const::IMAGE_USE_TYPE_CROWD,C1001Const::IMAGE_USE_TYPE_GZ];
+
+    public static function GetImageServerPath()
+    {
+        if(defined("DB_DEV") === true)
+        {
+            return C1001Const::IMAGE_SERVER_PATH_DEV;
+        }
+        else{
+            return C1001Const::IMAGE_SERVER_PATH;
+        }
+    }
+
 
 }
